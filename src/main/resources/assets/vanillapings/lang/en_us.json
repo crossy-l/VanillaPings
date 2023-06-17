@@ -1,0 +1,5 @@
+{
+  "vanillapings.category": "Vanilla Pings",
+  "vanillapings.ping": "Ping",
+  "vanillapings.ping.message": "%s pinged %2s at (x: %d, y: %d, z: %d)"
+}

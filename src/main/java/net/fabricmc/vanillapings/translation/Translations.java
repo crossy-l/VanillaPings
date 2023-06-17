@@ -1,0 +1,34 @@
+package net.fabricmc.vanillapings.translation;
+
+import net.fabricmc.vanillapings.util.Triple;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.math.Vec3i;
+
+public class Translations {
+    public static final String KEY_CATEGORY = "vanillapings.category";
+    public static final String KEY_PING = "vanillapings.ping";
+    public static final String KEY_PING_MESSAGE = "vanillapings.ping.message";
+
+    public static final Translatable PING = new Translatable(
+            translator -> translator.getAsText(KEY_PING)
+    );
+
+    public static final TranslatableSingle<Triple<String, Text, Vec3i>> PING_MESSAGE = new TranslatableSingle<>(
+      (translator, extra) -> {
+          String msg = translator.get(KEY_PING_MESSAGE);
+          if(msg.split("%2s").length != 2)
+              return Text.literal(msg);
+          String msg2 = msg.split("%2s")[1];
+          msg = msg.split("%2s")[0];
+
+          MutableText text = (MutableText) Text.of(String.format(msg, extra.first()));
+          text.append(extra.second());
+          text.append(Text.of(String.format(msg2,  extra.third().getX(), extra.third().getY(), extra.third().getZ())));
+          text.formatted(Formatting.GRAY, Formatting.ITALIC);
+
+          return text;
+      }
+    );
+}
