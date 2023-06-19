@@ -1,4 +1,4 @@
-package net.fabricmc.vanillapings.ping;
+package net.fabricmc.vanillapings.features.ping;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleTypes;

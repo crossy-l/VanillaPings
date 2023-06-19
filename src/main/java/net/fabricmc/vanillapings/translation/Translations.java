@@ -8,11 +8,16 @@ import net.minecraft.util.math.Vec3i;
 
 public class Translations {
     public static final String KEY_CATEGORY = "vanillapings.category";
+    public static final String KEY_RELOAD = "vanillapings.reload";
     public static final String KEY_PING = "vanillapings.ping";
     public static final String KEY_PING_MESSAGE = "vanillapings.ping.message";
 
     public static final Translatable PING = new Translatable(
             translator -> translator.getAsText(KEY_PING)
+    );
+
+    public static final Translatable RELOAD = new Translatable(
+            translator -> translator.getAsText(KEY_RELOAD)
     );
 
     public static final TranslatableSingle<Triple<String, Text, Vec3i>> PING_MESSAGE = new TranslatableSingle<>(

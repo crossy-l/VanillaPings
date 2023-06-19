@@ -21,7 +21,6 @@ public class Settings {
 
     public void init() {
         reload();
-        saveSettings();
     }
 
     protected void saveSettings() {
@@ -31,6 +30,7 @@ public class Settings {
     public void reload() {
         cfg = new FileConfig(configFile);
         loadSettings();
+        saveSettings();
     }
 
     protected void loadSettings() {}

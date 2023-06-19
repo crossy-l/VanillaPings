@@ -1,6 +1,6 @@
 package net.fabricmc.vanillapings.networking.packet;
 
-import net.fabricmc.vanillapings.ping.PingManager;
+import net.fabricmc.vanillapings.features.ping.PingManager;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;

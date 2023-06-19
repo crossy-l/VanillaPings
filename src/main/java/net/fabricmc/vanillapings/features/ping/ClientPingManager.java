@@ -1,4 +1,4 @@
-package net.fabricmc.vanillapings.ping;
+package net.fabricmc.vanillapings.features.ping;
 
 import net.fabricmc.vanillapings.networking.CPingPackets;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

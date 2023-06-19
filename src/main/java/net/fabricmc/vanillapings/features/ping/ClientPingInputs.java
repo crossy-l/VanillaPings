@@ -1,4 +1,4 @@
-package net.fabricmc.vanillapings.ping;
+package net.fabricmc.vanillapings.features.ping;
 
 import net.fabricmc.vanillapings.translation.Translations;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;

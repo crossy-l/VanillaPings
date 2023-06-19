@@ -1,9 +1,10 @@
 package net.fabricmc.vanillapings;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.vanillapings.commands.VanillaPingsCommands;
 import net.fabricmc.vanillapings.config.PingSettings;
 import net.fabricmc.vanillapings.networking.CPingPackets;
-import net.fabricmc.vanillapings.ping.PingManager;
+import net.fabricmc.vanillapings.features.ping.PingManager;
 import net.fabricmc.vanillapings.translation.Translator;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -24,7 +25,7 @@ public class VanillaPings implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTING.register(server1 -> server = server1);
 		ServerTickEvents.END_SERVER_TICK.register(server1 -> PingManager.tick());
 		CPingPackets.registerC2SPackets();
-		PingManager.registerCommands();
+		VanillaPingsCommands.registerCommands();
 		SETTINGS.init();
 		// Initialize default translator now instead of when it's needed
 		Translator.getTranslator();

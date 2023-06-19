@@ -66,6 +66,14 @@ public class FileConfig {
         }
     }
 
+    public double getDouble(String key) {
+        try {
+            return Double.parseDouble(properties.getProperty(key));
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
+
     public boolean getBoolean(String key) {
         return Boolean.parseBoolean(properties.getProperty(key));
     }

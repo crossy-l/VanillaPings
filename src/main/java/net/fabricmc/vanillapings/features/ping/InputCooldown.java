@@ -1,4 +1,4 @@
-package net.fabricmc.vanillapings.ping;
+package net.fabricmc.vanillapings.features.ping;
 
 public class InputCooldown {
     private final int maxCooldown;

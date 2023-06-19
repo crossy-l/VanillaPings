@@ -70,6 +70,10 @@ public class Translator {
         return Text.literal(translations.get(key));
     }
 
+    public static void clearTranslators() {
+        languages.clear();
+    }
+
     public static Translator getTranslator(String key) {
         if(!languages.containsKey(key)) {
             loadLanguage(key);

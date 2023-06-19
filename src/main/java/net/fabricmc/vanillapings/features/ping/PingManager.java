@@ -1,6 +1,7 @@
-package net.fabricmc.vanillapings.ping;
+package net.fabricmc.vanillapings.features.ping;
 
 import com.mojang.brigadier.Command;
+import net.fabricmc.vanillapings.VanillaPings;
 import net.fabricmc.vanillapings.translation.Translations;
 import net.fabricmc.vanillapings.util.Triple;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -33,16 +34,7 @@ import static net.minecraft.server.command.CommandManager.*;
 import java.util.*;
 
 public class PingManager {
-    private static final int MAX_RAYCAST_DISTANCE = 500;
     private static final List<PingedEntity> entities = new ArrayList<>();
-
-    public static void registerCommands() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
-                literal("ping")
-                        .requires(serverCommandSource -> serverCommandSource.getEntity() != null)
-                        .executes(ctx -> pingInFrontOfEntity((ServerPlayerEntity) Objects.requireNonNull(ctx.getSource().getEntity())))
-        ));
-    }
 
     public static int pingInFrontOfEntity(ServerPlayerEntity player) {
         @Nullable RayResult result = getTargetPos(player, true);
@@ -145,7 +137,7 @@ public class PingManager {
 
         Vec3d playerPos = sourceEntity.getCameraPosVec(1.0F);
         Vec3d raycastDir = sourceEntity.getRotationVec(1.0F);
-        Vec3d raycastEnd = playerPos.add(raycastDir.multiply(MAX_RAYCAST_DISTANCE));
+        Vec3d raycastEnd = playerPos.add(raycastDir.multiply(VanillaPings.SETTINGS.getPingRange()));
 
         BlockHitResult blockHitResult = world.raycast(new RaycastContext(playerPos, raycastEnd,
                 RaycastContext.ShapeType.OUTLINE, includeFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, sourceEntity));
@@ -158,7 +150,7 @@ public class PingManager {
 
     public static @Nullable RayResult getTargetEntityPos(Entity sourceEntity) {
         Vec3d start = sourceEntity.getCameraPosVec(1.0F);
-        Vec3d end = start.add(sourceEntity.getRotationVec(1.0F).multiply(MAX_RAYCAST_DISTANCE));
+        Vec3d end = start.add(sourceEntity.getRotationVec(1.0F).multiply(VanillaPings.SETTINGS.getPingRange()));
         Box searchBox = sourceEntity.getBoundingBox().stretch(end.subtract(start)).expand(1.0D);
 
         double closestDistance = Double.POSITIVE_INFINITY;

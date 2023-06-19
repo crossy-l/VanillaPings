@@ -1,5 +1,6 @@
 {
   "vanillapings.category": "Vanilla Pings",
+  "vanillapings.reload": "Vanilla Pings reloaded successfully",
   "vanillapings.ping": "Ping",
   "vanillapings.ping.message": "%s pinged %2s at (x: %d, y: %d, z: %d)"
 }
