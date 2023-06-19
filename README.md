@@ -2,7 +2,7 @@
 
 A Minecraft mod to easily ping entities and locations. The pings show up using armor stands and have glowing on them. This makes it possible for the mod to be server side only.
 
-It's possible to customize the language used for the ping messages see [custom messages](#custom-messages-only-required-on-the-server).
+It's possible to customize the language used for the ping messages see [custom messages](#custom-messages).
 
 The mod uses the game rules `sendCommandFeedback` and `logAdminCommands` for command feedback and logging like vanilla commands. Right now only on the `/vanillapings reload` command.
 
