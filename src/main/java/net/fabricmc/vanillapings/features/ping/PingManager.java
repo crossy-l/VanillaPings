@@ -1,6 +1,7 @@
 package net.fabricmc.vanillapings.features.ping;
 
 import com.mojang.brigadier.Command;
+import io.netty.util.concurrent.SingleThreadEventExecutor;
 import net.fabricmc.vanillapings.VanillaPings;
 import net.fabricmc.vanillapings.translation.Translations;
 import net.fabricmc.vanillapings.util.Triple;
@@ -22,6 +23,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -32,18 +34,28 @@ import org.jetbrains.annotations.Nullable;
 import static net.minecraft.server.command.CommandManager.*;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PingManager {
     private static final List<PingedEntity> entities = new ArrayList<>();
+    private static final Style noPingStyle = Text.empty().getStyle().withColor(Formatting.AQUA);
+    private static final Text noPingText = Text.literal("_noping").setStyle(noPingStyle);
 
-    public static int pingInFrontOfEntity(ServerPlayerEntity player) {
-        @Nullable RayResult result = getTargetPos(player, true);
-        if(result == null)
-            return Command.SINGLE_SUCCESS;
+    public static void pingInFrontOfEntity(ServerPlayerEntity player) {
+        @Nullable Vec3d pos = getTargetPos(player, VanillaPings.SETTINGS.getPingRange());
+        @Nullable RayResult result = getTargetEntityPos(player);
+        @Nullable Entity targetEntity = result == null ? null : result.entity;
 
-        Vec3d pos = result.position;
+        if(result != null)
+            pos = result.position;
+        if(pos == null)
+            return;
 
-        ServerWorld world = (ServerWorld) player.getWorld();
+        pingAtPosition(pos, targetEntity, player, player.getServerWorld());
+    }
+
+    public static void pingAtPosition(Vec3d pos, @Nullable Entity pingEntity, ServerPlayerEntity player, ServerWorld world) {
         NbtCompound nbt = new NbtCompound();
         nbt.putBoolean("Marker", true);
         nbt.putBoolean("Small", true);
@@ -59,6 +71,7 @@ public class PingManager {
 
         ArmorStandEntity entity = Objects.requireNonNull(EntityType.ARMOR_STAND.create(world));
         entity.readCustomDataFromNbt(nbt);
+        entity.setCustomName(noPingText);
 
         entity.setPos(pos.getX(), pos.getY() - .8, pos.getZ());
         entity.setInvulnerable(true);
@@ -69,14 +82,12 @@ public class PingManager {
         entity.setGlowing(true);
         world.spawnEntity(entity);
 
-        if(result.entity != null)
-            world.getPlayers().forEach(serverPlayerEntity -> serverPlayerEntity.sendMessage(Translations.PING_MESSAGE.constructMessage(new Triple<>(player.getName().getString(), getTextForEntity(result.entity), new Vec3i((int) Math.round(pos.x), (int)Math.round(pos.y), (int)Math.round(pos.z))))));
+        if(pingEntity != null)
+            world.getPlayers().forEach(serverPlayerEntity -> serverPlayerEntity.sendMessage(Translations.PING_MESSAGE.constructMessage(new Triple<>(player.getName().getString(), getTextForEntity(pingEntity), new Vec3i((int) Math.round(pos.x), (int)Math.round(pos.y), (int)Math.round(pos.z))))));
 
         PingedEntity pingedEntity = new PingedEntity(entity, 20 * 5);
         entities.add(pingedEntity);
         pingedEntity.tick();
-
-        return Command.SINGLE_SUCCESS;
     }
 
     public static Text getTextForEntity(Entity entity) {
@@ -117,35 +128,46 @@ public class PingManager {
         return completeText;
     }
 
-    public static RayResult getTargetPos(Entity entity, boolean includeFluids) {
-        @Nullable RayResult closestBlock = getTargetBlockPos(entity, includeFluids);
-        @Nullable RayResult closestEntity = getTargetEntityPos(entity);
+    public static @Nullable Vec3d getTargetPos(Entity entity, double maxDistance) {
+        Vec3d startPos = entity.getCameraPosVec(1.0f);
+        Vec3d lookVec = entity.getRotationVec(1.0f);
 
-        if(closestBlock == null)
-            return closestEntity;
-        else if(closestEntity == null)
-            return closestBlock;
+        double stepMultiplier = 0.5;
 
-        Vec3d start = entity.getCameraPosVec(1.0F);
-        if(start.distanceTo(closestBlock.position) < start.distanceTo(closestEntity.position))
-            return closestBlock;
-        return closestEntity;
-    }
+        double dx = lookVec.x * stepMultiplier;
+        double dy = lookVec.y * stepMultiplier;
+        double dz = lookVec.z * stepMultiplier;
 
-    public static @Nullable RayResult getTargetBlockPos(Entity sourceEntity, boolean includeFluids) {
-        World world = sourceEntity.getEntityWorld();
+        double x = startPos.x;
+        double y = startPos.y;
+        double z = startPos.z;
 
-        Vec3d playerPos = sourceEntity.getCameraPosVec(1.0F);
-        Vec3d raycastDir = sourceEntity.getRotationVec(1.0F);
-        Vec3d raycastEnd = playerPos.add(raycastDir.multiply(VanillaPings.SETTINGS.getPingRange()));
+        World world = entity.getWorld();
 
-        BlockHitResult blockHitResult = world.raycast(new RaycastContext(playerPos, raycastEnd,
-                RaycastContext.ShapeType.OUTLINE, includeFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, sourceEntity));
+        double distance = 0.0;
+        Vec3d prevPos = startPos;
+        double yChange;
 
-        if (blockHitResult.getType() == HitResult.Type.MISS)
-            return null;
+        while (distance < maxDistance) {
+            yChange = y - prevPos.getY();
+            BlockPos currentPos = new BlockPos((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z));
+            Vec3d distancePos = new Vec3d(x, startPos.y, z);
+            double distanceToStart = startPos.distanceTo(distancePos);
 
-        return new RayResult(blockHitResult.getPos(), null);
+            if (distanceToStart > 256 || distanceToStart > maxDistance || currentPos.getY() > world.getHeight() && yChange > 0 || currentPos.getY() < world.getHeight() * -1 && yChange < 0)
+                return null;
+
+            if (!world.getBlockState(currentPos).isAir())
+                return new Vec3d(x, world.getBlockState(currentPos.add(0, 1, 0)).isAir() ? y + 0.25 : y, z);
+
+            prevPos = new Vec3d(x, y, z);
+            x += dx;
+            y += dy;
+            z += dz;
+            distance += 1 * stepMultiplier;
+        }
+
+        return null;
     }
 
     public static @Nullable RayResult getTargetEntityPos(Entity sourceEntity) {
@@ -168,6 +190,8 @@ public class PingManager {
                 }
             } else if (hitResult.isPresent()) {
                 double distance = start.distanceTo(hitResult.get());
+                if(entity.getCustomName() != null && entity.getCustomName().equals(noPingText))
+                    continue;
                 if (distance < closestDistance || closestDistance == 0.0D) {
                     closestDistance = distance;
                     pos = hitResult.get();

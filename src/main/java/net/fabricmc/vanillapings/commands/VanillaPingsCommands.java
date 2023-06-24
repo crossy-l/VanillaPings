@@ -1,5 +1,6 @@
 package net.fabricmc.vanillapings.commands;
 
+import com.mojang.brigadier.Command;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.vanillapings.VanillaPings;
 import net.fabricmc.vanillapings.features.ping.PingManager;
@@ -28,7 +29,10 @@ public class VanillaPingsCommands {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
                 literal("ping")
                         .requires(serverCommandSource -> serverCommandSource.getEntity() != null)
-                        .executes(ctx -> PingManager.pingInFrontOfEntity((ServerPlayerEntity) Objects.requireNonNull(ctx.getSource().getEntity())))
+                        .executes(ctx -> {
+                            PingManager.pingInFrontOfEntity((ServerPlayerEntity) Objects.requireNonNull(ctx.getSource().getEntity()));
+                            return Command.SINGLE_SUCCESS;
+                        })
         ));
     }
 
