@@ -1,11 +1,9 @@
 package net.fabricmc.vanillapings.features.ping;
 
-import com.mojang.brigadier.Command;
-import io.netty.util.concurrent.SingleThreadEventExecutor;
 import net.fabricmc.vanillapings.VanillaPings;
 import net.fabricmc.vanillapings.translation.Translations;
 import net.fabricmc.vanillapings.util.Triple;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -21,21 +19,12 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.util.math.*;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import static net.minecraft.server.command.CommandManager.*;
-
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class PingManager {
     private static final List<PingedEntity> entities = new ArrayList<>();
@@ -43,13 +32,21 @@ public class PingManager {
     private static final Text noPingText = Text.literal("_noping").setStyle(noPingStyle);
 
     public static void pingInFrontOfEntity(ServerPlayerEntity player) {
-        @Nullable Vec3d pos = getTargetPos(player, VanillaPings.SETTINGS.getPingRange());
+        @Nullable Vec3d pos = getTargetPos(player, VanillaPings.SETTINGS.getPingRange(), player.interactionManager.getGameMode() == GameMode.SPECTATOR);
         @Nullable RayResult result = getTargetEntityPos(player);
-        @Nullable Entity targetEntity = result == null ? null : result.entity;
+        @Nullable Entity targetEntity = null;
 
-        if(result != null)
+        if(pos == null && result != null) {
+            targetEntity = result.entity;
             pos = result.position;
-        if(pos == null)
+        }
+        else if(pos != null && result != null) {
+            if(result.position.distanceTo(player.getPos()) < pos.distanceTo(player.getPos())) {
+                pos = result.position;
+                targetEntity = result.entity;
+            }
+        }
+        else if(pos == null)
             return;
 
         pingAtPosition(pos, targetEntity, player, player.getServerWorld());
@@ -128,7 +125,7 @@ public class PingManager {
         return completeText;
     }
 
-    public static @Nullable Vec3d getTargetPos(Entity entity, double maxDistance) {
+    public static @Nullable Vec3d getTargetPos(Entity entity, double maxDistance, boolean spectator) {
         Vec3d startPos = entity.getCameraPosVec(1.0f);
         Vec3d lookVec = entity.getRotationVec(1.0f);
 
@@ -157,7 +154,8 @@ public class PingManager {
             if (distanceToStart > 256 || distanceToStart > maxDistance || currentPos.getY() > world.getHeight() && yChange > 0 || currentPos.getY() < world.getHeight() * -1 && yChange < 0)
                 return null;
 
-            if (!world.getBlockState(currentPos).isAir())
+            BlockState state = world.getBlockState(currentPos);
+            if (!state.isAir())
                 return new Vec3d(x, world.getBlockState(currentPos.add(0, 1, 0)).isAir() ? y + 0.25 : y, z);
 
             prevPos = new Vec3d(x, y, z);
@@ -212,6 +210,5 @@ public class PingManager {
     }
 
     record RayResult(Vec3d position, @Nullable Entity entity) {
-
     }
 }
