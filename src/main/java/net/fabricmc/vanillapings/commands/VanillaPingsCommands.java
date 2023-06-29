@@ -30,7 +30,7 @@ public class VanillaPingsCommands {
                 literal("ping")
                         .requires(serverCommandSource -> serverCommandSource.getEntity() != null)
                         .executes(ctx -> {
-                            PingManager.pingInFrontOfEntity((ServerPlayerEntity) Objects.requireNonNull(ctx.getSource().getEntity()));
+                            PingManager.pingWithCooldown((ServerPlayerEntity) Objects.requireNonNull(ctx.getSource().getEntity()));
                             return Command.SINGLE_SUCCESS;
                         })
         ));

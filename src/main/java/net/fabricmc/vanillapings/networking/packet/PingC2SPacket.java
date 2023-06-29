@@ -13,6 +13,6 @@ import java.util.concurrent.Executors;
 public class PingC2SPacket {
     private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
     public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        server.execute(() -> PingManager.pingInFrontOfEntity(player));
+        server.execute(() -> PingManager.pingWithCooldown(player));
     }
 }

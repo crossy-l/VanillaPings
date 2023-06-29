@@ -30,6 +30,16 @@ public class PingManager {
     private static final List<PingedEntity> entities = new ArrayList<>();
     private static final Style noPingStyle = Text.empty().getStyle().withColor(Formatting.AQUA);
     private static final Text noPingText = Text.literal("_noping").setStyle(noPingStyle);
+    private static final Map<UUID, Integer> playerCooldowns = new HashMap<>();
+
+    public static void pingWithCooldown(ServerPlayerEntity player) {
+        if(!playerCooldowns.containsKey(player.getUuid())) {
+            playerCooldowns.put(player.getUuid(), VanillaPings.SETTINGS.getPingCooldown());
+        } else
+            return;
+
+        pingInFrontOfEntity(player);
+    }
 
     public static void pingInFrontOfEntity(ServerPlayerEntity player) {
         @Nullable Vec3d pos = getTargetPos(player, VanillaPings.SETTINGS.getPingRange(), player.interactionManager.getGameMode() == GameMode.SPECTATOR);
@@ -204,9 +214,23 @@ public class PingManager {
         return new RayResult(pos, hitEntity);
     }
 
+    public static void tickCooldowns() {
+        var iterator = playerCooldowns.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Integer> entry = iterator.next();
+            int updatedValue = entry.getValue() - 1;
+            if (updatedValue < 0) {
+                iterator.remove(); // Remove the entry if value is negative
+            } else {
+                entry.setValue(updatedValue); // Update the value
+            }
+        }
+    }
+
     public static void tick() {
         entities.forEach(PingedEntity::tick);
         entities.removeIf(PingedEntity::isDead);
+        tickCooldowns();
     }
 
     record RayResult(Vec3d position, @Nullable Entity entity) {

@@ -22,6 +22,7 @@ For general settings there is the **vanillapings.properties** file found in the 
 #vanillapings.properties
 #Mon Jun 19 20:34:38 CEST 2023
 lang=en_us             # Specify the language used for ping chat messages
+ping-cooldown=5        # Specify the server side cooldown for pings sent by players in game ticks. Players ping speed using the hotkey is limited to 5 ticks per ping so that's also the default. (Note: "/ping" can be used to ping faster if the cooldown is set lower)
 ping-max-range=500.0   # Specify the max range a player can ping (Note: horizontal range is still limited to 256 due to that also being the max render distance)
 ```
 *You may delete the file to regenerate the default configuration upon a restart. A reload only reconstructs current values into the file (I will propably change this later).*
