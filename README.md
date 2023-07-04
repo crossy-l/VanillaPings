@@ -39,6 +39,8 @@ When a player pings an entity the server sends a message with information about 
 
 ## Troubleshooting
 ### Ping signals sticking around indefinitely
+*This is no longer relevant in versions >= 1.4 since then old pings are automatically removed.*
+
 Normally all pings despawn after some time. In some cases however for example when the server is extremely laggy or crashes while pings are present the automatic ping deletion might not work. You might see floating pings that can't be interacted with in the world and wonder how to remove them.
 Since they're just armor stands with a glass head one can delete them with a simple command:
 

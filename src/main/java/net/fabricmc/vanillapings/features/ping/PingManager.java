@@ -10,17 +10,22 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +36,7 @@ public class PingManager {
     private static final Style noPingStyle = Text.empty().getStyle().withColor(Formatting.AQUA);
     private static final Text noPingText = Text.literal("_noping").setStyle(noPingStyle);
     private static final Map<UUID, Integer> playerCooldowns = new HashMap<>();
+    private static final InputCooldown clearOldPingCooldown = new InputCooldown(20);
 
     public static void pingWithCooldown(ServerPlayerEntity player) {
         if(!playerCooldowns.containsKey(player.getUuid())) {
@@ -42,7 +48,14 @@ public class PingManager {
     }
 
     public static void pingInFrontOfEntity(ServerPlayerEntity player) {
-        @Nullable Vec3d pos = getTargetPos(player, VanillaPings.SETTINGS.getPingRange(), player.interactionManager.getGameMode() == GameMode.SPECTATOR);
+        // All of this certainly needs to be refactored, but it works for now
+        boolean isNotInWater = player.getBlockStateAtPos().getFluidState().isEmpty();
+        @Nullable Vec3d pos = getTargetPos(player, VanillaPings.SETTINGS.getPingRange(), isNotInWater);
+        if(pos != null && pos.distanceTo(player.getPos()) < 200) {
+            @Nullable Vec3d specificPos = getSpecificTargetPos(player, isNotInWater, pos.distanceTo(player.getPos()) + 25);
+            if(specificPos != null)
+                pos = specificPos;
+        }
         @Nullable RayResult result = getTargetEntityPos(player);
         @Nullable Entity targetEntity = null;
 
@@ -135,7 +148,7 @@ public class PingManager {
         return completeText;
     }
 
-    public static @Nullable Vec3d getTargetPos(Entity entity, double maxDistance, boolean spectator) {
+    public static @Nullable Vec3d getTargetPos(Entity entity, double maxDistance, boolean includeFluids) {
         Vec3d startPos = entity.getCameraPosVec(1.0f);
         Vec3d lookVec = entity.getRotationVec(1.0f);
 
@@ -165,8 +178,14 @@ public class PingManager {
                 return null;
 
             BlockState state = world.getBlockState(currentPos);
-            if (!state.isAir())
-                return new Vec3d(x, world.getBlockState(currentPos.add(0, 1, 0)).isAir() ? y + 0.25 : y, z);
+            if (!state.isAir()) {
+                Vec3d returnPos = new Vec3d(x, world.getBlockState(currentPos.add(0, 1, 0)).isAir() ? y + 0.25 : y, z);
+                if(!includeFluids) {
+                    if(state.getFluidState().isEmpty())
+                        return returnPos;
+                } else
+                    return returnPos;
+            }
 
             prevPos = new Vec3d(x, y, z);
             x += dx;
@@ -176,6 +195,22 @@ public class PingManager {
         }
 
         return null;
+    }
+
+    public static Vec3d getSpecificTargetPos(Entity sourceEntity, boolean includeFluids, double maxDistance) {
+        World world = sourceEntity.getEntityWorld();
+
+        Vec3d playerPos = sourceEntity.getCameraPosVec(1.0F);
+        Vec3d raycastDir = sourceEntity.getRotationVec(1.0F);
+        Vec3d raycastEnd = playerPos.add(raycastDir.multiply(maxDistance));
+
+        BlockHitResult blockHitResult = world.raycast(new RaycastContext(playerPos, raycastEnd,
+                RaycastContext.ShapeType.OUTLINE, includeFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, sourceEntity));
+
+        if (blockHitResult.getType() == HitResult.Type.MISS)
+            return null;
+
+        return blockHitResult.getPos();
     }
 
     public static @Nullable RayResult getTargetEntityPos(Entity sourceEntity) {
@@ -227,10 +262,27 @@ public class PingManager {
         }
     }
 
-    public static void tick() {
+    public static void removeOldPings(MinecraftServer server) {
+        for (ServerWorld world : server.getWorlds()) {
+            List<Entity> remove = new ArrayList<>();
+            world.iterateEntities().forEach(entity -> {
+                if(entity != null && entity.getCustomName() != null && entity.getCustomName().equals(noPingText) && entities.stream().noneMatch(pingedEntity -> pingedEntity.getEntity().equals(entity)))
+                    remove.add(entity);
+            });
+            remove.forEach(Entity::kill);
+        }
+    }
+
+    public static void tick(MinecraftServer server) {
         entities.forEach(PingedEntity::tick);
         entities.removeIf(PingedEntity::isDead);
         tickCooldowns();
+
+        if(clearOldPingCooldown.isReady()) {
+            removeOldPings(server);
+            clearOldPingCooldown.triggerCooldown();
+        }
+        clearOldPingCooldown.tick();
     }
 
     record RayResult(Vec3d position, @Nullable Entity entity) {

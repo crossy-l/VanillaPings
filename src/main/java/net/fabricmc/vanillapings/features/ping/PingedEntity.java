@@ -67,4 +67,8 @@ public class PingedEntity {
     public boolean isDead() {
         return dead;
     }
+
+    public Entity getEntity() {
+        return entity;
+    }
 }

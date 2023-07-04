@@ -23,7 +23,7 @@ public class VanillaPings implements ModInitializer {
 	public void onInitialize() {
 		instance = this;
 		ServerLifecycleEvents.SERVER_STARTING.register(server1 -> server = server1);
-		ServerTickEvents.END_SERVER_TICK.register(server1 -> PingManager.tick());
+		ServerTickEvents.END_SERVER_TICK.register(PingManager::tick);
 		CPingPackets.registerC2SPackets();
 		VanillaPingsCommands.registerCommands();
 		SETTINGS.init();
