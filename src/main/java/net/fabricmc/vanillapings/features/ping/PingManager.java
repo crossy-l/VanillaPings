@@ -9,8 +9,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -24,7 +25,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
-import net.minecraft.world.GameMode;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -76,36 +76,48 @@ public class PingManager {
     }
 
     public static void pingAtPosition(Vec3d pos, @Nullable Entity pingEntity, ServerPlayerEntity player, ServerWorld world) {
-        NbtCompound nbt = new NbtCompound();
-        nbt.putBoolean("Marker", true);
-        nbt.putBoolean("Small", true);
-        NbtList nbtList = new NbtList();
-        NbtCompound compound = new NbtCompound();
-        Items.AIR.getDefaultStack().writeNbt(compound);
-        nbtList.add(compound);
-        nbtList.add(compound);
-        nbtList.add(compound);
-        Items.BLUE_STAINED_GLASS.getDefaultStack().writeNbt(compound);
-        nbtList.add(compound);
-        nbt.put("ArmorItems", nbtList);
+        boolean animate = true;
+        boolean kill = true;
 
-        ArmorStandEntity entity = Objects.requireNonNull(EntityType.ARMOR_STAND.create(world));
-        entity.readCustomDataFromNbt(nbt);
-        entity.setCustomName(noPingText);
+        Entity targetEntity;
+        if(pingEntity instanceof LivingEntity livingEntity) {
+            animate = false;
+            kill = false;
+            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 20 * 5, 0));
+            targetEntity = livingEntity;
+        } else {
+            NbtCompound nbt = new NbtCompound();
+            nbt.putBoolean("Marker", true);
+            nbt.putBoolean("Small", true);
+            NbtList nbtList = new NbtList();
+            NbtCompound compound = new NbtCompound();
+            Items.AIR.getDefaultStack().writeNbt(compound);
+            nbtList.add(compound);
+            nbtList.add(compound);
+            nbtList.add(compound);
+            Items.BLUE_STAINED_GLASS.getDefaultStack().writeNbt(compound);
+            nbtList.add(compound);
+            nbt.put("ArmorItems", nbtList);
 
-        entity.setPos(pos.getX(), pos.getY() - .8, pos.getZ());
-        entity.setInvulnerable(true);
-        entity.setNoGravity(true);
-        entity.setInvisible(true);
-        entity.setHideBasePlate(true);
-        entity.setShowArms(false);
-        entity.setGlowing(true);
-        world.spawnEntity(entity);
+            ArmorStandEntity entity = Objects.requireNonNull(EntityType.ARMOR_STAND.create(world));
+            entity.readCustomDataFromNbt(nbt);
+            entity.setCustomName(noPingText);
+
+            entity.setPos(pos.getX(), pos.getY() - .8, pos.getZ());
+            entity.setInvulnerable(true);
+            entity.setNoGravity(true);
+            entity.setInvisible(true);
+            entity.setHideBasePlate(true);
+            entity.setShowArms(false);
+            entity.setGlowing(true);
+            world.spawnEntity(entity);
+            targetEntity = entity;
+        }
 
         if(pingEntity != null)
             world.getPlayers().forEach(serverPlayerEntity -> serverPlayerEntity.sendMessage(Translations.PING_MESSAGE.constructMessage(new Triple<>(player.getName().getString(), getTextForEntity(pingEntity), new Vec3i((int) Math.round(pos.x), (int)Math.round(pos.y), (int)Math.round(pos.z))))));
 
-        PingedEntity pingedEntity = new PingedEntity(entity, 20 * 5);
+        PingedEntity pingedEntity = new PingedEntity(targetEntity, 20 * 5, animate, kill);
         entities.add(pingedEntity);
         pingedEntity.tick();
     }

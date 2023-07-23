@@ -18,10 +18,14 @@ public class PingedEntity {
     private final float rotationSpeed = 100.0f;
     private int soundAge = 0;
     private float takeOffY = 0;
+    private boolean animate = true;
+    private boolean kill = true;
 
-    public PingedEntity(Entity entity, int maxAge) {
+    public PingedEntity(Entity entity, int maxAge, boolean animate, boolean kill) {
         this.entity = entity;
         this.maxAge = maxAge;
+        this.animate = animate;
+        this.kill = kill;
         startY = entity.getY();
     }
 
@@ -29,7 +33,22 @@ public class PingedEntity {
         if(dead)
             return;
 
-        animate();
+        if(animate)
+            animate();
+
+        audibilize();
+
+        if(age >= maxAge) {
+            dead = true;
+
+            if(kill)
+                entity.kill();
+        }
+
+        age++;
+    }
+
+    private void audibilize() {
 
         if(soundAge == 0)
             entity.getWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL.value(), SoundCategory.PLAYERS, 10f, 1);
@@ -38,16 +57,11 @@ public class PingedEntity {
         if(soundAge == 7)
             entity.getWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 10f, 1.5f);
 
-        soundAge++;
-
         if(age >= maxAge) {
-            ((ServerWorld)entity.getWorld()).spawnParticles(ParticleTypes.FIREWORK, entity.getX(), entity.getY() + 1.25, entity.getZ(), 10, 0, 0, 0, 0d);
-            ((ServerWorld)entity.getWorld()).spawnParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY() + 1.15, entity.getZ(), 10, 0, 0, 0, 0d);
             entity.getWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 10f, 1.25f);
-            entity.kill();
-            dead = true;
         }
-        age++;
+
+        soundAge++;
     }
 
     private void animate() {
@@ -62,6 +76,11 @@ public class PingedEntity {
         float rotation = age * rotationSpeed;
         rotation = MathHelper.wrapDegrees(rotation);
         entity.setYaw(rotation);
+
+        if(age >= maxAge) {
+            ((ServerWorld)entity.getWorld()).spawnParticles(ParticleTypes.FIREWORK, entity.getX(), entity.getY() + 1.2, entity.getZ(), 10, 0, 0, 0, 0d);
+            ((ServerWorld)entity.getWorld()).spawnParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY() + 1.10, entity.getZ(), 10, 0, 0, 0, 0d);
+        }
     }
 
     public boolean isDead() {
