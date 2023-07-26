@@ -12,6 +12,7 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -48,22 +49,22 @@ public class PingManager {
     }
 
     public static void pingInFrontOfEntity(ServerPlayerEntity player) {
-        // All of this certainly needs to be refactored, but it works for now
         boolean isNotInWater = player.getBlockStateAtPos().getFluidState().isEmpty();
-        @Nullable Vec3d pos = getTargetPos(player, VanillaPings.SETTINGS.getPingRange(), isNotInWater);
+        @Nullable Entity targetEntity = null;
+
+        @Nullable Vec3d pos = fastRaycast(player, VanillaPings.SETTINGS.getPingRange(), isNotInWater);
         if(pos != null && pos.distanceTo(player.getPos()) < 200) {
-            @Nullable Vec3d specificPos = getSpecificTargetPos(player, isNotInWater, pos.distanceTo(player.getPos()) + 25);
+            @Nullable Vec3d specificPos = exactRaycast(player, isNotInWater, pos.distanceTo(player.getPos()) + 25);
             if(specificPos != null)
                 pos = specificPos;
         }
-        @Nullable RayResult result = getTargetEntityPos(player);
-        @Nullable Entity targetEntity = null;
+
+        @Nullable RayResult result = fastEntityRaycast(player);
 
         if(pos == null && result != null) {
             targetEntity = result.entity;
             pos = result.position;
-        }
-        else if(pos != null && result != null) {
+        } else if(pos != null && result != null) {
             if(result.position.distanceTo(player.getPos()) < pos.distanceTo(player.getPos())) {
                 pos = result.position;
                 targetEntity = result.entity;
@@ -124,7 +125,17 @@ public class PingManager {
 
     public static Text getTextForEntity(Entity entity) {
         if(entity instanceof ItemEntity itemEntity) {
-            return itemEntity.getStack().toHoverableText();
+            MutableText completeText = (MutableText) itemEntity.getStack().toHoverableText();
+
+            if(VanillaPings.SETTINGS.isPingItemCount() && VanillaPings.SETTINGS.getPingItemCountRange() != 0) {
+                int amount = countStackableItemsInRange(itemEntity.getWorld(), itemEntity.getPos(), VanillaPings.SETTINGS.getPingItemCountRange(), itemEntity.getStack());
+                if(amount > 1) {
+                    MutableText amountText = (MutableText) Text.of(String.format(" (%dx)", amount));
+                    completeText.append(amountText);
+                }
+            }
+
+            return completeText;
         }
 
         MutableText completeText = Text.empty().formatted(Formatting.BOLD);
@@ -134,7 +145,7 @@ public class PingManager {
         else if(entity instanceof LivingEntity)
             nameStyle = completeText.getStyle().withColor(Formatting.DARK_GREEN);
 
-        MutableText nameText = (MutableText) Text.literal(entity.getName().getString());
+        MutableText nameText = Text.literal(entity.getName().getString());
         nameText.setStyle(nameStyle);
         completeText.append(nameText);
 
@@ -160,7 +171,28 @@ public class PingManager {
         return completeText;
     }
 
-    public static @Nullable Vec3d getTargetPos(Entity entity, double maxDistance, boolean includeFluids) {
+    public static int countStackableItemsInRange(World world, Vec3d center, double range, ItemStack targetItem) {
+        int totalCount = 0;
+
+        Box boundingBox = new Box(
+            center.getX() - range, center.getY() - range, center.getZ() - range,
+            center.getX() + range, center.getY() + range, center.getZ() + range
+        );
+
+        for (Entity entity : world.getEntitiesByClass(Entity.class, boundingBox, entity -> entity instanceof ItemEntity)) {
+            ItemEntity itemEntity = (ItemEntity) entity;
+
+            ItemStack itemStack = itemEntity.getStack();
+            // Make sure the item is of the same type has the same name and enchantments
+            if (itemStack.getItem() == targetItem.getItem() && itemStack.getName().equals(targetItem.getName()) && itemStack.getEnchantments().equals(targetItem.getEnchantments())) {
+                totalCount += itemStack.getCount();
+            }
+        }
+
+        return totalCount;
+    }
+
+    public static @Nullable Vec3d fastRaycast(Entity entity, double maxDistance, boolean includeFluids) {
         Vec3d startPos = entity.getCameraPosVec(1.0f);
         Vec3d lookVec = entity.getRotationVec(1.0f);
 
@@ -209,7 +241,7 @@ public class PingManager {
         return null;
     }
 
-    public static Vec3d getSpecificTargetPos(Entity sourceEntity, boolean includeFluids, double maxDistance) {
+    public static Vec3d exactRaycast(Entity sourceEntity, boolean includeFluids, double maxDistance) {
         World world = sourceEntity.getEntityWorld();
 
         Vec3d playerPos = sourceEntity.getCameraPosVec(1.0F);
@@ -225,7 +257,7 @@ public class PingManager {
         return blockHitResult.getPos();
     }
 
-    public static @Nullable RayResult getTargetEntityPos(Entity sourceEntity) {
+    public static @Nullable RayResult fastEntityRaycast(Entity sourceEntity) {
         Vec3d start = sourceEntity.getCameraPosVec(1.0F);
         Vec3d end = start.add(sourceEntity.getRotationVec(1.0F).multiply(VanillaPings.SETTINGS.getPingRange()));
         Box searchBox = sourceEntity.getBoundingBox().stretch(end.subtract(start)).expand(1.0D);
