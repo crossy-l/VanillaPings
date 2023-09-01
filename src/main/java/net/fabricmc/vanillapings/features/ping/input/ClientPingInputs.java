@@ -1,5 +1,7 @@
-package net.fabricmc.vanillapings.features.ping;
+package net.fabricmc.vanillapings.features.ping.input;
 
+import net.fabricmc.vanillapings.features.ping.ClientPingManager;
+import net.fabricmc.vanillapings.util.InputCooldown;
 import net.fabricmc.vanillapings.translation.Translations;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;

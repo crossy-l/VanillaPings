@@ -1,7 +1,7 @@
 package net.fabricmc.vanillapings;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.vanillapings.features.ping.ClientPingInputs;
+import net.fabricmc.vanillapings.features.ping.input.ClientPingInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
