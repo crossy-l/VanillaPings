@@ -374,6 +374,9 @@ public class PingManager {
     }
 
     private static void tickOldPingCooldown(MinecraftServer server) {
+        if(!VanillaPings.SETTINGS.isPingRemoveOld())
+            return;
+
         if(clearOldPingCooldown.isReady()) {
             removeOldPings(server);
             clearOldPingCooldown.triggerCooldown();
@@ -382,7 +385,7 @@ public class PingManager {
     }
 
     /**
-     * Gets called once per game tick and updates all time related ping systems.
+     * Gets called once per server tick and updates all time related ping systems.
      */
     public static void tick(MinecraftServer server) {
         entities.forEach(PingedEntity::tick);

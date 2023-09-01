@@ -24,6 +24,7 @@ ping-cooldown=5            # Server side cooldown for pings sent by players in g
 ping-max-range=500.0       # Max range a player can ping (Note: horizontal range is still limited to 256 due to that also being the max render distance)
 ping-item-count=true       # Show the count of items near an item ping
 ping-item-count-range=1.0  # Range for counting items near an item ping
+ping-remove-old=true       # If old pings should be removed automatically every 20s. Old pings are created when a ping hasn't deleted itself due to the world unloading.
 ```
 *You may delete the file to regenerate the default configuration upon a restart. A reload only reconstructs current values into the file (This behaviour will likely change in future updates).*
 

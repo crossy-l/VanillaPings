@@ -12,12 +12,14 @@ public class PingSettings extends Settings {
     private static final String KEY_PING_COOLDOWN = "ping-cooldown";
     private static final String KEY_PING_ITEM_COUNT = "ping-item-count";
     private static final String KEY_PING_ITEM_COUNT_RANGE = "ping-item-count-range";
+    private static final String KEY_PING_REMOVE_OLD_PINGS = "ping-remove-old";
     private final List<SettingsEvent> settingEvents = new ArrayList<>();
     private String defaultLanguage = LanguageManager.DEFAULT_LANGUAGE_CODE;
     private double pingRange = 500;
     private int pingCooldown = 5;
     private boolean pingItemCount = true;
     private double pingItemCountRange = 1;
+    private boolean pingRemoveOld = true;
 
     public boolean registerSettingsEvent(SettingsEvent event) {
         return settingEvents.add(event);
@@ -34,6 +36,7 @@ public class PingSettings extends Settings {
         cfg.put(KEY_PING_COOLDOWN, pingCooldown);
         cfg.put(KEY_PING_ITEM_COUNT, pingItemCount);
         cfg.put(KEY_PING_ITEM_COUNT_RANGE, pingItemCountRange);
+        cfg.put(KEY_PING_REMOVE_OLD_PINGS, pingRemoveOld);
         super.saveSettings();
     }
 
@@ -50,6 +53,8 @@ public class PingSettings extends Settings {
             pingItemCount = cfg.getBoolean(KEY_PING_ITEM_COUNT);
         if(cfg.containsKey(KEY_PING_ITEM_COUNT_RANGE))
             pingItemCountRange = cfg.getDouble(KEY_PING_ITEM_COUNT_RANGE);
+        if(cfg.containsKey(KEY_PING_REMOVE_OLD_PINGS))
+            pingRemoveOld = cfg.getBoolean(KEY_PING_REMOVE_OLD_PINGS);
 
         if(pingItemCountRange < 0)
             pingItemCountRange = 0;
@@ -77,6 +82,10 @@ public class PingSettings extends Settings {
 
     public double getPingItemCountRange() {
         return pingItemCountRange;
+    }
+
+    public boolean isPingRemoveOld() {
+        return pingRemoveOld;
     }
 
     private void invokeSettingsRefreshed() {
