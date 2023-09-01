@@ -345,16 +345,20 @@ public class PingManager {
     /**
      * Loops over all loaded entities and removes them if they are a leftover ping armor stand.
      * @param server The server to use.
+     * @return The amount of old pings removed.
      */
-    public static void removeOldPings(MinecraftServer server) {
+    public static int removeOldPings(MinecraftServer server) {
+        int removed = 0;
         for (ServerWorld world : server.getWorlds()) {
             List<Entity> remove = new ArrayList<>();
             world.iterateEntities().forEach(entity -> {
                 if(entity != null && entity.getCustomName() != null && entity.getCustomName().equals(noPingText) && entities.stream().noneMatch(pingedEntity -> pingedEntity.getEntity().equals(entity)))
                     remove.add(entity);
             });
+            removed += remove.size();
             remove.forEach(Entity::kill);
         }
+        return removed;
     }
 
     /**

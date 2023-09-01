@@ -10,7 +10,8 @@ public class Translations {
     public static final String KEY_CATEGORY = "vanillapings.category";
     public static final String KEY_RELOAD = "vanillapings.reload";
     public static final String KEY_PING = "vanillapings.ping";
-    public static final String KEY_PING_MESSAGE = "vanillapings.ping.message";
+    public static final String KEY_PING_REMOVED_OLD = KEY_PING + ".remove_old";
+    public static final String KEY_PING_MESSAGE = KEY_PING + ".message";
 
     public static final Translatable PING = new Translatable(
             translator -> translator.getAsText(KEY_PING)
@@ -18,6 +19,11 @@ public class Translations {
 
     public static final Translatable RELOAD = new Translatable(
             translator -> translator.getAsText(KEY_RELOAD)
+    );
+
+    public static final TranslatableSingle<Integer> REMOVED_OLD = new TranslatableSingle<>(
+            (translator, count) -> Text.literal(String.format(translator.get(KEY_PING_REMOVED_OLD), count)),
+            () -> 0
     );
 
     public static final TranslatableSingle<Triple<String, Text, Vec3i>> PING_MESSAGE = new TranslatableSingle<>(

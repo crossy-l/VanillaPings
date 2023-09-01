@@ -2,7 +2,6 @@ package net.fabricmc.vanillapings.commands;
 
 import com.mojang.brigadier.Command;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.vanillapings.VanillaPings;
 import net.fabricmc.vanillapings.features.ping.PingManager;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.MinecraftServer;
@@ -23,8 +22,10 @@ public class VanillaPingsCommands {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
                 literal("vanillapings")
                         .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
-                                .then(literal("reload")
-                                        .executes(ReloadCommand::Reload))
+                        .then(literal("reload")
+                            .executes(ReloadCommand::Reload))
+                        .then(literal("removeOld")
+                                .executes(RemoveCommand::removeOldPings))
         ));
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
                 literal("ping")
