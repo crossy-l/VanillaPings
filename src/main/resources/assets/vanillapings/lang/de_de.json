@@ -3,5 +3,6 @@
   "vanillapings.reload": "Vanilla Pings erfolgreich neu geladen",
   "vanillapings.ping": "Ping",
   "vanillapings.ping.remove_old": "%d alte Pings entfernt",
-  "vanillapings.ping.message": "%s pingt %2s bei (x: %d, y: %d, z: %d)"
+  "vanillapings.ping.message": "%s pingt %2s bei (x: %d, y: %d, z: %d)",
+  "vanillapings.ping.message_directional": "Ping %s %d %s"
 }

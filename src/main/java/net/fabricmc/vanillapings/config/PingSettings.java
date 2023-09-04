@@ -9,6 +9,8 @@ import java.util.List;
 public class PingSettings extends Settings {
     private static final String KEY_DEFAULT_LANGUAGE = "lang";
     private static final String KEY_PING_RANGE = "ping-max-range";
+    private static final String KEY_PING_CHAT_MESSAGE_RANGE = "ping-chat-message-range";
+    private static final String KEY_PING_DIRECTION_MESSAGE_RANGE = "ping-direction-message-range";
     private static final String KEY_PING_COOLDOWN = "ping-cooldown";
     private static final String KEY_PING_ITEM_COUNT = "ping-item-count";
     private static final String KEY_PING_ITEM_COUNT_RANGE = "ping-item-count-range";
@@ -16,6 +18,8 @@ public class PingSettings extends Settings {
     private final List<SettingsEvent> settingEvents = new ArrayList<>();
     private String defaultLanguage = LanguageManager.DEFAULT_LANGUAGE_CODE;
     private double pingRange = 500;
+    private double pingChatMessageRange = 160;
+    private double pingDirectionMessageRange = 160;
     private int pingCooldown = 5;
     private boolean pingItemCount = true;
     private double pingItemCountRange = 1;
@@ -33,6 +37,8 @@ public class PingSettings extends Settings {
     protected void saveSettings() {
         cfg.put(KEY_DEFAULT_LANGUAGE, defaultLanguage);
         cfg.put(KEY_PING_RANGE, pingRange);
+        cfg.put(KEY_PING_CHAT_MESSAGE_RANGE, pingChatMessageRange);
+        cfg.put(KEY_PING_DIRECTION_MESSAGE_RANGE, pingDirectionMessageRange);
         cfg.put(KEY_PING_COOLDOWN, pingCooldown);
         cfg.put(KEY_PING_ITEM_COUNT, pingItemCount);
         cfg.put(KEY_PING_ITEM_COUNT_RANGE, pingItemCountRange);
@@ -47,6 +53,10 @@ public class PingSettings extends Settings {
             defaultLanguage = cfg.getString(KEY_DEFAULT_LANGUAGE);
         if(cfg.containsKey(KEY_PING_RANGE))
             pingRange = cfg.getDouble(KEY_PING_RANGE);
+        if(cfg.containsKey(KEY_PING_CHAT_MESSAGE_RANGE))
+            pingChatMessageRange = cfg.getDouble(KEY_PING_CHAT_MESSAGE_RANGE);
+        if(cfg.containsKey(KEY_PING_DIRECTION_MESSAGE_RANGE))
+            pingDirectionMessageRange = cfg.getDouble(KEY_PING_DIRECTION_MESSAGE_RANGE);
         if(cfg.containsKey(KEY_PING_COOLDOWN))
             pingCooldown = cfg.getInteger(KEY_PING_COOLDOWN);
         if(cfg.containsKey(KEY_PING_ITEM_COUNT))
@@ -58,8 +68,12 @@ public class PingSettings extends Settings {
 
         if(pingItemCountRange < 0)
             pingItemCountRange = 0;
-        if(pingRange < 0)
+        if(pingRange < 0 && pingRange != -1)
             pingRange = 0;
+        if(pingChatMessageRange < 0 && pingChatMessageRange != -1)
+            pingChatMessageRange = 0;
+        if(pingDirectionMessageRange < 0 && pingDirectionMessageRange != -1)
+            pingDirectionMessageRange = 0;
 
         invokeSettingsRefreshed();
     }
@@ -69,7 +83,23 @@ public class PingSettings extends Settings {
     }
 
     public double getPingRange() {
-        return pingRange;
+        return pingRange == -1 ? 5000 : pingRange;
+    }
+
+    public double getPingChatMessageRange() {
+        return pingChatMessageRange;
+    }
+
+    public boolean hasInfinitePingChatMessageRange() {
+        return pingChatMessageRange == -1;
+    }
+
+    public double getPingDirectionMessageRange() {
+        return pingDirectionMessageRange;
+    }
+
+    public boolean hasInfinitePingDirectionMessageRange() {
+        return pingDirectionMessageRange == -1;
     }
 
     public int getPingCooldown() {

@@ -132,12 +132,85 @@ public class PingManager {
             targetEntity = entity;
         }
 
-        if(pingEntity != null)
-            world.getPlayers().forEach(serverPlayerEntity -> serverPlayerEntity.sendMessage(Translations.PING_MESSAGE.constructMessage(new Triple<>(player.getName().getString(), getTextForEntity(pingEntity), new Vec3i((int) Math.round(pos.x), (int)Math.round(pos.y), (int)Math.round(pos.z))))));
+        world.getPlayers().forEach(serverPlayerEntity -> {
+            Vec3d playerPos = serverPlayerEntity.getPos();
+            int distance = (int)Math.floor(new Vec3d(pos.x - playerPos.x, 0, pos.z - playerPos.z).length());
+            if(distance < VanillaPings.SETTINGS.getPingDirectionMessageRange() || VanillaPings.SETTINGS.hasInfinitePingDirectionMessageRange()) {
+                double degree = getDegreeDirectionToPing(pos, serverPlayerEntity.getPos());
+                double relDegree = getRelativeDegree(degree, serverPlayerEntity.getYaw());
+                var pingDirMessage = Translations.PING_DIRECTION_MESSAGE.constructMessage(new Triple<>(distance, getPingDirectionArrow(relDegree), getPingCardinalDirection(degree)));
+                serverPlayerEntity.sendMessage(pingDirMessage, true);
+            }
+
+            if(pingEntity != null && (distance < VanillaPings.SETTINGS.getPingChatMessageRange() || VanillaPings.SETTINGS.hasInfinitePingChatMessageRange())) {
+                var pingMessage = Translations.PING_MESSAGE.constructMessage(new Triple<>(player.getName().getString(), getTextForEntity(pingEntity), new Vec3i((int) Math.round(pos.x), (int)Math.round(pos.y), (int)Math.round(pos.z))));
+                serverPlayerEntity.sendMessage(pingMessage);
+            }
+        });
 
         PingedEntity pingedEntity = new PingedEntity(targetEntity, 20 * 5, animate, kill);
         entities.add(pingedEntity);
         pingedEntity.tick();
+    }
+
+    private static double getRelativeDegree(double degree, double playerYaw) {
+        if(playerYaw < 0)
+            playerYaw += 360;
+        playerYaw = 270 - playerYaw;
+        double relDegree = degree + playerYaw;
+        if(relDegree > 360)
+            relDegree -= 360;
+        return relDegree;
+    }
+
+    private static double getDegreeDirectionToPing(Vec3d pingLocation, Vec3d playerLocation) {
+        double ak = pingLocation.x - playerLocation.x;
+        double gk = pingLocation.z - playerLocation.z;
+        double hy = new Vec3d(ak, 0, pingLocation.z - playerLocation.z).length();
+        double degree = Math.acos(ak/hy) * (180d/Math.PI);
+
+        if(gk < 0) {
+            degree = 360 - degree;
+        }
+        return degree;
+    }
+
+    private static String getPingDirectionArrow(double degree) {
+        if(degree >= 22.5 && degree <= 67.5) {
+            return "\uD83E\uDC7D";
+        } else if(degree >= 67.5 && degree <= 112.5) {
+            return "\uD83E\uDC7A";
+        } else if (degree >= 112.5 && degree <= 157.5) {
+            return "\uD83E\uDC7E";
+        } else if(degree >= 157.5 && degree <= 202.5) {
+            return "\uD83E\uDC7B";
+        } else if(degree >= 202.5 && degree <= 247.5) {
+            return "\uD83E\uDC7F";
+        } else if(degree >= 247.5 && degree <= 292.5) {
+            return "\uD83E\uDC78";
+        } else if(degree >= 292.5 && degree <= 337.5) {
+            return "\uD83E\uDC7C";
+        }
+        return "\uD83E\uDC79";
+    }
+
+    private static String getPingCardinalDirection(double degree) {
+        if(degree >= 22.5 && degree <= 67.5) {
+            return "SE";
+        } else if(degree >= 67.5 && degree <= 112.5) {
+            return "S";
+        } else if (degree >= 112.5 && degree <= 157.5) {
+            return "SW";
+        } else if(degree >= 157.5 && degree <= 202.5) {
+            return "W";
+        } else if(degree >= 202.5 && degree <= 247.5) {
+            return "NW";
+        } else if(degree >= 247.5 && degree <= 292.5) {
+            return "N";
+        } else if(degree >= 292.5 && degree <= 337.5) {
+            return "NE";
+        }
+        return "E";
     }
 
     private static Text getTextForEntity(Entity entity) {

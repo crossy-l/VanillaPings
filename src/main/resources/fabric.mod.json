@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "vanillapings",
-  "version": "1.6.2",
+  "version": "1.7",
 
   "name": "Vanilla Pings",
   "description": "Adds simple pinging of locations and entities to nearby players in a vanilla way (using armor stands and glowing). If you use this mod on the client you can configure a hotkey for pinging. (Only works if the server has the mod installed)",
