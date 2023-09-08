@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "vanillapings",
-  "version": "1.7",
+  "version": "1.7.6",
 
   "name": "Vanilla Pings",
   "description": "Adds simple pinging of locations and entities to nearby players in a vanilla way (using armor stands and glowing). If you use this mod on the client you can configure a hotkey for pinging. (Only works if the server has the mod installed)",
@@ -20,10 +20,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.vanillapings.VanillaPings"
+      "com.vanillapings.VanillaPings"
     ],
     "client": [
-      "net.fabricmc.vanillapings.VanillaPingsClient"
+      "com.vanillapings.VanillaPingsClient"
     ]
   },
   "mixins": [
