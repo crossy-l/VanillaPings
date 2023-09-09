@@ -81,6 +81,7 @@ public class Translator {
         if(!languages.containsKey(key)) {
             VanillaPings.LOGGER.error("Can't load translator for " + key + " falling back to: " + LanguageManager.DEFAULT_LANGUAGE_CODE);
             loadLanguage(LanguageManager.DEFAULT_LANGUAGE_CODE);
+            return languages.get(LanguageManager.DEFAULT_LANGUAGE_CODE);
         }
         return languages.get(key);
     }
