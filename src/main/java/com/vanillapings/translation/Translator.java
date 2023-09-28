@@ -5,7 +5,6 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.vanillapings.VanillaPings;
 import com.vanillapings.config.FileConfig;
-import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
@@ -17,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Translator {
+    public static final String DEFAULT_LANGUAGE = "en_us";
     public static Map<String, Translator> languages = new HashMap<>();
     private Map<String, String> translations;
 
@@ -79,9 +79,9 @@ public class Translator {
             loadLanguage(key);
         }
         if(!languages.containsKey(key)) {
-            VanillaPings.LOGGER.error("Can't load translator for " + key + " falling back to: " + LanguageManager.DEFAULT_LANGUAGE_CODE);
-            loadLanguage(LanguageManager.DEFAULT_LANGUAGE_CODE);
-            return languages.get(LanguageManager.DEFAULT_LANGUAGE_CODE);
+            VanillaPings.LOGGER.error("Can't load translator for " + key + " falling back to: " + DEFAULT_LANGUAGE);
+            loadLanguage(DEFAULT_LANGUAGE);
+            return languages.get(DEFAULT_LANGUAGE);
         }
         return languages.get(key);
     }

@@ -1,6 +1,6 @@
 package com.vanillapings.config;
 
-import net.minecraft.client.resource.language.LanguageManager;
+import com.vanillapings.translation.Translator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public class PingSettings extends Settings {
     private static final String KEY_PING_ITEM_COUNT_RANGE = "ping-item-count-range";
     private static final String KEY_PING_REMOVE_OLD_PINGS = "ping-remove-old";
     private final List<SettingsEvent> settingEvents = new ArrayList<>();
-    private String defaultLanguage = LanguageManager.DEFAULT_LANGUAGE_CODE;
+    private String defaultLanguage = Translator.DEFAULT_LANGUAGE; //LanguageManager.DEFAULT_LANGUAGE_CODE;
     private double pingRange = 500;
     private double pingChatMessageRange = 160;
     private double pingDirectionMessageRange = 160;
