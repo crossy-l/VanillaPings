@@ -1,6 +1,8 @@
 package com.vanillapings.features.ping;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -10,7 +12,7 @@ import net.minecraft.util.math.MathHelper;
 public class PingedEntity {
     private boolean dead = false;
     private final int maxAge;
-    private int age;
+    private int age = 0;
     private final Entity entity;
     private final double startY;
     private final double amplitude = .1;
@@ -18,13 +20,15 @@ public class PingedEntity {
     private final float rotationSpeed = 100.0f;
     private int soundAge = 0;
     private float takeOffY = 0;
-    private boolean animate = true;
-    private boolean kill = true;
+    private boolean animate;
+    private boolean kill;
+    private HighlightSettings highlightSettings;
 
-    public PingedEntity(Entity entity, int maxAge, boolean animate, boolean kill) {
+    public PingedEntity(Entity entity, int maxAge, boolean animate, boolean kill, HighlightSettings highlightSettings) {
         this.entity = entity;
         this.maxAge = maxAge;
         this.animate = animate;
+        this.highlightSettings = highlightSettings;
         this.kill = kill;
         startY = entity.getY();
     }
@@ -33,19 +37,50 @@ public class PingedEntity {
         if(dead)
             return;
 
+        if(age == 0)
+            start();
+
         if(animate)
             animate();
+
+        // Highlight animation
+        if(highlightSettings.isHighlight() && shouldInterfereWithGlowing()) {
+            highlightSettings.animate(age, maxAge, entity);
+        }
 
         audibilize();
 
         if(age >= maxAge) {
             dead = true;
-
-            if(kill)
-                entity.kill();
+            end();
         }
 
         age++;
+    }
+
+    private void start() {
+        if(highlightSettings.isHighlight() && shouldInterfereWithGlowing()) {
+            entity.setGlowing(true);
+        }
+    }
+
+    private void end() {
+        if(shouldInterfereWithGlowing() && highlightSettings.isHighlight()) {
+            entity.setGlowing(false);
+        }
+
+        if(kill)
+            entity.kill();
+    }
+
+    private boolean shouldInterfereWithGlowing() {
+        if(highlightSettings.isHighlight()) {
+            if(entity instanceof LivingEntity livingEntity) {
+                return !livingEntity.getStatusEffects().stream().anyMatch(statusEffectInstance -> statusEffectInstance.getEffectType().equals(StatusEffects.GLOWING));
+            }
+            return true;
+        }
+        return false;
     }
 
     private void audibilize() {
@@ -65,6 +100,7 @@ public class PingedEntity {
     }
 
     private void animate() {
+        // Particles and floating up and down
         double y = startY + MathHelper.sin((float)(age * frequency)) * amplitude + amplitude;
 
         if(maxAge - age < 20) {

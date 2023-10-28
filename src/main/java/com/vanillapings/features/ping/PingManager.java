@@ -5,15 +5,11 @@ import com.vanillapings.VanillaPings;
 import com.vanillapings.util.InputCooldown;
 import com.vanillapings.util.Triple;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -21,7 +17,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -109,13 +104,13 @@ public class PingManager {
     public static void pingAtPosition(Vec3d pos, @Nullable Entity pingEntity, PlayerEntity player, World world) {
         boolean animate = true;
         boolean kill = true;
+        HighlightSettings highlight = new HighlightSettings(VanillaPings.SETTINGS.isPingGlowing(), VanillaPings.SETTINGS.isPingGlowingFlash(), 5, .65f);
 
         Entity targetEntity;
-        if(pingEntity instanceof LivingEntity livingEntity) {
+        if(pingEntity != null) {
             animate = false;
             kill = false;
-            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 20 * 5, 0));
-            targetEntity = livingEntity;
+            targetEntity = pingEntity;
         } else {
             NbtCompound nbt = new NbtCompound();
             nbt.putBoolean("Marker", true);
@@ -140,11 +135,12 @@ public class PingManager {
             entity.setInvisible(true);
             entity.setHideBasePlate(true);
             entity.setShowArms(false);
-            entity.setGlowing(true);
+            // entity.setGlowing(true); No longer needed since glowing is now handled by the highlight parameter of the PingEntity
             world.spawnEntity(entity);
             targetEntity = entity;
         }
 
+        // Send ping message
         world.getPlayers().forEach(playerEntity -> {
             Vec3d playerPos = playerEntity.getPos();
             int distance = (int)Math.floor(new Vec3d(pos.x - playerPos.x, 0, pos.z - playerPos.z).length());
@@ -161,7 +157,7 @@ public class PingManager {
             }
         });
 
-        PingedEntity pingedEntity = new PingedEntity(targetEntity, 20 * 5, animate, kill);
+        PingedEntity pingedEntity = new PingedEntity(targetEntity, 20 * 5, animate, kill, highlight);
         entities.add(pingedEntity);
         pingedEntity.tick();
     }

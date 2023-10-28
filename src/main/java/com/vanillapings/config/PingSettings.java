@@ -15,6 +15,8 @@ public class PingSettings extends Settings {
     private static final String KEY_PING_ITEM_COUNT = "ping-item-count";
     private static final String KEY_PING_ITEM_COUNT_RANGE = "ping-item-count-range";
     private static final String KEY_PING_REMOVE_OLD_PINGS = "ping-remove-old";
+    private static final String KEY_PING_GLOWING = "ping-glowing";
+    private static final String KEY_PING_GLOWING_FLASH = "ping-glowing-flash";
     private final List<SettingsEvent> settingEvents = new ArrayList<>();
     private String defaultLanguage = Translator.DEFAULT_LANGUAGE; //LanguageManager.DEFAULT_LANGUAGE_CODE;
     private double pingRange = 500;
@@ -24,6 +26,8 @@ public class PingSettings extends Settings {
     private boolean pingItemCount = true;
     private double pingItemCountRange = 1;
     private boolean pingRemoveOld = true;
+    private boolean pingGlowing = true;
+    private boolean pingGlowingFlash = true;
 
     public boolean registerSettingsEvent(SettingsEvent event) {
         return settingEvents.add(event);
@@ -43,6 +47,8 @@ public class PingSettings extends Settings {
         cfg.put(KEY_PING_ITEM_COUNT, pingItemCount);
         cfg.put(KEY_PING_ITEM_COUNT_RANGE, pingItemCountRange);
         cfg.put(KEY_PING_REMOVE_OLD_PINGS, pingRemoveOld);
+        cfg.put(KEY_PING_GLOWING, pingGlowing);
+        cfg.put(KEY_PING_GLOWING_FLASH, pingGlowingFlash);
         super.saveSettings();
     }
 
@@ -65,6 +71,10 @@ public class PingSettings extends Settings {
             pingItemCountRange = cfg.getDouble(KEY_PING_ITEM_COUNT_RANGE);
         if(cfg.containsKey(KEY_PING_REMOVE_OLD_PINGS))
             pingRemoveOld = cfg.getBoolean(KEY_PING_REMOVE_OLD_PINGS);
+        if(cfg.containsKey(KEY_PING_GLOWING))
+            pingGlowing = cfg.getBoolean(KEY_PING_GLOWING);
+        if(cfg.containsKey(KEY_PING_GLOWING_FLASH))
+            pingGlowingFlash = cfg.getBoolean(KEY_PING_GLOWING_FLASH);
 
         if(pingItemCountRange < 0)
             pingItemCountRange = 0;
@@ -116,6 +126,14 @@ public class PingSettings extends Settings {
 
     public boolean isPingRemoveOld() {
         return pingRemoveOld;
+    }
+
+    public boolean isPingGlowing() {
+        return pingGlowing;
+    }
+
+    public boolean isPingGlowingFlash() {
+        return pingGlowingFlash;
     }
 
     private void invokeSettingsRefreshed() {
