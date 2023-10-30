@@ -1,9 +1,14 @@
 package com.vanillapings.config;
 
 import com.vanillapings.translation.Translator;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 // like normal settings but with a default enable/disable setting
 public class PingSettings extends Settings {
@@ -17,6 +22,7 @@ public class PingSettings extends Settings {
     private static final String KEY_PING_REMOVE_OLD_PINGS = "ping-remove-old";
     private static final String KEY_PING_GLOWING = "ping-glowing";
     private static final String KEY_PING_GLOWING_FLASH = "ping-glowing-flash";
+    private static final String KEY_PING_ITEM = "ping-item";
     private final List<SettingsEvent> settingEvents = new ArrayList<>();
     private String defaultLanguage = Translator.DEFAULT_LANGUAGE; //LanguageManager.DEFAULT_LANGUAGE_CODE;
     private double pingRange = 500;
@@ -28,6 +34,7 @@ public class PingSettings extends Settings {
     private boolean pingRemoveOld = true;
     private boolean pingGlowing = true;
     private boolean pingGlowingFlash = true;
+    private Item pingItem = Items.BLUE_STAINED_GLASS;
 
     public boolean registerSettingsEvent(SettingsEvent event) {
         return settingEvents.add(event);
@@ -49,6 +56,7 @@ public class PingSettings extends Settings {
         cfg.put(KEY_PING_REMOVE_OLD_PINGS, pingRemoveOld);
         cfg.put(KEY_PING_GLOWING, pingGlowing);
         cfg.put(KEY_PING_GLOWING_FLASH, pingGlowingFlash);
+        cfg.put(KEY_PING_ITEM, Registries.ITEM.getId(pingItem).toString());
         super.saveSettings();
     }
 
@@ -75,6 +83,14 @@ public class PingSettings extends Settings {
             pingGlowing = cfg.getBoolean(KEY_PING_GLOWING);
         if(cfg.containsKey(KEY_PING_GLOWING_FLASH))
             pingGlowingFlash = cfg.getBoolean(KEY_PING_GLOWING_FLASH);
+        if(cfg.containsKey(KEY_PING_ITEM)) {
+            String itemIdentifier = Objects.requireNonNull(cfg.getString(KEY_PING_ITEM));
+            Identifier pingItemIdentifier = new Identifier(itemIdentifier);
+            if(!Registries.ITEM.containsId(pingItemIdentifier))
+                pingItem = Items.BLUE_STAINED_GLASS;
+            else
+                pingItem = Registries.ITEM.get(pingItemIdentifier);
+        }
 
         if(pingItemCountRange < 0)
             pingItemCountRange = 0;
@@ -134,6 +150,10 @@ public class PingSettings extends Settings {
 
     public boolean isPingGlowingFlash() {
         return pingGlowingFlash;
+    }
+
+    public Item getPingItem() {
+        return pingItem;
     }
 
     private void invokeSettingsRefreshed() {

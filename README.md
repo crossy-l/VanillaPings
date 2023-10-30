@@ -23,17 +23,18 @@ The mod is required on the server. But not mandatory for clients. However, using
 For general settings use the **vanillapings.properties** file found in the ``config/vanillapings`` folder of your server or minecraft folder. Settings should be configured on the **server side** or on your **local client** if you play single player or share your world via open to lan.
 ```properties
 #vanillapings.properties
-#Mon Sep 04 15:04:23 CEST 2023
-lang=en_us                          # Language used for ping chat messages
-ping-cooldown=5                     # Server side cooldown for pings sent by players in game ticks. Players ping speed using the hotkey is limited to 5 ticks per ping so that's also the default. (Note: "/ping" can be used to ping faster if the cooldown is set lower)
-ping-max-range=500.0                # Max range a player can ping (Note: horizontal range is still limited to 256 due to that also being the max render distance) (-1=max-range, 0=disabled)
-ping-chat-message-range=160.0       # Range a player needs to be near a ping to see chat messages (-1=no limit, 0=disabled)
-ping-direction-message-range=160.0  # Range a player needs to be near a ping to see direction messages in the action bar (-1=no limit, 0=disabled)
-ping-item-count=true                # Show the count of items near an item ping
-ping-item-count-range=1.0           # Range for counting items near an item ping
-ping-remove-old=true                # If old pings should be removed automatically every 20s. Old pings are created when a ping hasn't deleted itself due to the world unloading.
-ping-glowing=true                   # If pings should be highlighted with glowing.
-ping-glowing-flash=true             # Start flashing the ping (only if ping-glowing is enabled) when it's about to disappear.
+#Mon Oct 30 13:56:50 CET 2023
+lang=en_us                             # Language used for ping chat messages
+ping-chat-message-range=160.0          # Range a player needs to be near a ping to see chat messages (-1=no limit, 0=disabled)
+ping-cooldown=5                        # Server side cooldown for pings sent by players in game ticks. Players ping speed using the hotkey is limited to 5 ticks per ping so that's also the default. (Note: "/ping" can be used to ping faster if the cooldown is set lower)
+ping-direction-message-range=160.0     # Range a player needs to be near a ping to see direction messages in the action bar (-1=no limit, 0=disabled)
+ping-glowing=true                      # If pings should be highlighted with glowing.
+ping-glowing-flash=true                # Start flashing the ping (only if ping-glowing is enabled) when it's about to disappear.
+ping-item=minecraft\:red_stained_glass # The type of item that's used for a ping. (empty=default, nonexistent item=default)
+ping-item-count=true                   # Show the count of items near an item ping
+ping-item-count-range=1.0              # Range for counting items near an item ping
+ping-max-range=500.0                   # Max range a player can ping. (Note: horizontal range is still limited to 256 due to that also being the max render distance) (-1=max-range, 0=disabled)
+ping-remove-old=true                   # If old pings should be removed automatically every 20s. Old pings are created when a ping hasn't deleted itself due to the world unloading.
 ```
 *You may delete the file to regenerate the default configuration upon a restart. A reload only reconstructs current values into the file (This behaviour will likely change in future updates).*
 
@@ -46,4 +47,4 @@ When a player pings an entity the server sends a message with information about 
 * Fill out the json in your language and select the language in the config **lang** field. E.g. if your file is named **fr_fr.json** you have to specify **fr_fr** as the **lang** in the **vanillapings.properties** config file.
 * Restart your server or use ``/vanillapings reload`` to reload the configuration.
 
-*In spectator mode you can see the invisible armor stand wearing the highlighted block (in case your curious).*
+*In spectator mode you can see the invisible armor stand wearing the highlighted block (in case you're curious).*

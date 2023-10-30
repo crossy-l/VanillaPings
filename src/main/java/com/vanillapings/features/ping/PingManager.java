@@ -121,7 +121,7 @@ public class PingManager {
             nbtList.add(compound);
             nbtList.add(compound);
             nbtList.add(compound);
-            Items.BLUE_STAINED_GLASS.getDefaultStack().writeNbt(compound);
+            VanillaPings.SETTINGS.getPingItem().getDefaultStack().writeNbt(compound);
             nbtList.add(compound);
             nbt.put("ArmorItems", nbtList);
 
