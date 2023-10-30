@@ -87,9 +87,6 @@ public class Translator {
     }
 
     public static Translator getTranslator() {
-        // if(MinecraftClient.getInstance() == null)
-        //     return getTranslator(LanguageManager.DEFAULT_LANGUAGE_CODE);
-        // return getTranslator(((LanguageManagerAccessor) MinecraftClient.getInstance().getLanguageManager()).getCurrentLanguageCode());
         return getTranslator(VanillaPings.SETTINGS.getDefaultLanguage());
     }
 }
