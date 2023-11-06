@@ -157,7 +157,7 @@ public class PingManager {
             }
         });
 
-        PingedEntity pingedEntity = new PingedEntity(targetEntity, 20 * 5, animate, kill, highlight);
+        PingedEntity pingedEntity = new PingedEntity(targetEntity, 20 * 5, animate, kill, VanillaPings.SETTINGS.isPlaySound(), highlight);
         entities.add(pingedEntity);
         pingedEntity.tick();
     }

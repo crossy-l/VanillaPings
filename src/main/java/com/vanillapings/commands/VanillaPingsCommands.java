@@ -1,6 +1,8 @@
 package com.vanillapings.commands;
 
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.vanillapings.VanillaPings;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import com.vanillapings.features.ping.PingManager;
 import net.minecraft.entity.LivingEntity;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class VanillaPingsCommands {
@@ -26,6 +29,10 @@ public class VanillaPingsCommands {
                             .executes(ReloadCommand::Reload))
                         .then(literal("removeOld")
                                 .executes(RemoveCommand::removeOldPings))
+                        .then(literal("playSound")
+                                .executes(ctx -> PlaySoundCommand.setPlaySound(ctx, !VanillaPings.SETTINGS.isPlaySound()))
+                                .then(argument("value", BoolArgumentType.bool())
+                                        .executes(ctx -> PlaySoundCommand.setPlaySound(ctx, BoolArgumentType.getBool(ctx, "value")))))
         ));
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
                 literal("ping")

@@ -22,13 +22,15 @@ public class PingedEntity {
     private float takeOffY = 0;
     private boolean animate;
     private boolean kill;
+    private boolean playSound;
     private HighlightSettings highlightSettings;
 
-    public PingedEntity(Entity entity, int maxAge, boolean animate, boolean kill, HighlightSettings highlightSettings) {
+    public PingedEntity(Entity entity, int maxAge, boolean animate, boolean kill, boolean playSound, HighlightSettings highlightSettings) {
         this.entity = entity;
         this.maxAge = maxAge;
         this.animate = animate;
         this.highlightSettings = highlightSettings;
+        this.playSound = playSound;
         this.kill = kill;
         startY = entity.getY();
     }
@@ -48,7 +50,8 @@ public class PingedEntity {
             highlightSettings.animate(age, maxAge, entity);
         }
 
-        audibilize();
+        if(playSound)
+            audibilize();
 
         if(age >= maxAge) {
             dead = true;

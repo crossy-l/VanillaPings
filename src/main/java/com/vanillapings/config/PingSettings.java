@@ -23,6 +23,7 @@ public class PingSettings extends Settings {
     private static final String KEY_PING_GLOWING = "ping-glowing";
     private static final String KEY_PING_GLOWING_FLASH = "ping-glowing-flash";
     private static final String KEY_PING_ITEM = "ping-item";
+    private static final String KEY_PING_PLAY_SOUND = "ping-sound";
     private final List<SettingsEvent> settingEvents = new ArrayList<>();
     private String defaultLanguage = Translator.DEFAULT_LANGUAGE; //LanguageManager.DEFAULT_LANGUAGE_CODE;
     private double pingRange = 500;
@@ -30,6 +31,7 @@ public class PingSettings extends Settings {
     private double pingDirectionMessageRange = 160;
     private int pingCooldown = 5;
     private boolean pingItemCount = true;
+    private boolean playSound = true;
     private double pingItemCountRange = 1;
     private boolean pingRemoveOld = true;
     private boolean pingGlowing = true;
@@ -57,6 +59,7 @@ public class PingSettings extends Settings {
         cfg.put(KEY_PING_GLOWING, pingGlowing);
         cfg.put(KEY_PING_GLOWING_FLASH, pingGlowingFlash);
         cfg.put(KEY_PING_ITEM, Registries.ITEM.getId(pingItem).toString());
+        cfg.put(KEY_PING_PLAY_SOUND, playSound);
         super.saveSettings();
     }
 
@@ -83,6 +86,9 @@ public class PingSettings extends Settings {
             pingGlowing = cfg.getBoolean(KEY_PING_GLOWING);
         if(cfg.containsKey(KEY_PING_GLOWING_FLASH))
             pingGlowingFlash = cfg.getBoolean(KEY_PING_GLOWING_FLASH);
+        if(cfg.containsKey(KEY_PING_PLAY_SOUND)) {
+            playSound = cfg.getBoolean(KEY_PING_PLAY_SOUND);
+        }
         if(cfg.containsKey(KEY_PING_ITEM)) {
             String itemIdentifier = Objects.requireNonNull(cfg.getString(KEY_PING_ITEM));
             Identifier pingItemIdentifier = new Identifier(itemIdentifier);
@@ -130,6 +136,20 @@ public class PingSettings extends Settings {
 
     public int getPingCooldown() {
         return pingCooldown;
+    }
+
+    public boolean setPlaySound(boolean playSound) {
+        if(playSound == this.playSound) return false;
+
+        this.playSound = playSound;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
+    public boolean isPlaySound() {
+        return playSound;
     }
 
     public boolean isPingItemCount() {
