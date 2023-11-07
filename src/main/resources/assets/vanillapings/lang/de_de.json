@@ -6,6 +6,7 @@
   "vanillapings.ping.message": "%s pingt %2s bei (x: %d, y: %d, z: %d)",
   "vanillapings.ping.message_directional": "Ping %s %d %s",
   "vanillapings.ping.play_sound": "Ping-Ton",
+  "vanillapings.ping.item_count": "Ping-Item-Menge",
 
   "vanillapings.util.enabled.true": "%s ist aktiviert",
   "vanillapings.util.enabled.false": "%s ist deaktiviert",

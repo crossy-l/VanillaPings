@@ -148,6 +148,16 @@ public class PingSettings extends Settings {
         return true;
     }
 
+    public boolean setPingItemCount(boolean pingItemCount) {
+        if(pingItemCount == this.pingItemCount) return false;
+
+        this.pingItemCount = pingItemCount;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
     public boolean isPlaySound() {
         return playSound;
     }

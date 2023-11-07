@@ -16,7 +16,9 @@ The mod is required on the server. But not mandatory for clients. However, using
 * `/ping` to ping the block or any entity in front of you
 #### Admin commands *(only for operators, work from the console)*
 * `/vanillapings reload` to reload all [settings](#settings-file).
-* `/vanillapings removeOld` to remove pings that didn't disappear on their own. Also see [ping-remove-old (settings)](#settings-file).
+* `/vanillapings removeOld` to remove pings that didn't disappear on their own ([ping-remove-old (settings)](#settings-file)).
+* `/vanillapings playSound <true|false>` to disable/enable playing sounds when a ping appears ([ping-sound (settings)](#settings-file)).
+* `/vanillapings itemCount <true|false>` to disable/enable displaying the amount of items in a ping ([ping-item-count (settings)](#settings-file)).
 
 ## Configuration
 ### Settings file
@@ -35,6 +37,7 @@ ping-item-count=true                   # Show the count of items near an item pi
 ping-item-count-range=1.0              # Range for counting items near an item ping
 ping-max-range=500.0                   # Max range a player can ping. (Note: horizontal range is still limited to 256 due to that also being the max render distance) (-1=max-range, 0=disabled)
 ping-remove-old=true                   # If old pings should be removed automatically every 20s. Old pings are created when a ping hasn't deleted itself due to the world unloading.
+ping-sound=true                        # If a sound should be played when a ping appears
 ```
 *You may delete the file to regenerate the default configuration upon a restart. A reload only reconstructs current values into the file (This behaviour will likely change in future updates).*
 

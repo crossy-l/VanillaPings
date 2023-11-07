@@ -33,6 +33,10 @@ public class VanillaPingsCommands {
                                 .executes(ctx -> PlaySoundCommand.setPlaySound(ctx, !VanillaPings.SETTINGS.isPlaySound()))
                                 .then(argument("value", BoolArgumentType.bool())
                                         .executes(ctx -> PlaySoundCommand.setPlaySound(ctx, BoolArgumentType.getBool(ctx, "value")))))
+                        .then(literal("itemCount")
+                                .executes(ctx -> ItemCountCommand.setItemCount(ctx, !VanillaPings.SETTINGS.isPingItemCount()))
+                                .then(argument("value", BoolArgumentType.bool())
+                                        .executes(ctx -> ItemCountCommand.setItemCount(ctx, BoolArgumentType.getBool(ctx, "value")))))
         ));
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
                 literal("ping")

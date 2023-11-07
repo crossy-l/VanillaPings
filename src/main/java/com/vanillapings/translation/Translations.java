@@ -5,7 +5,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec3i;
 
 public class Translations {
@@ -17,6 +16,7 @@ public class Translations {
     public static final String KEY_PING = "vanillapings.ping";
     public static final String KEY_PING_REMOVED_OLD = KEY_PING + ".remove_old";
     public static final String KEY_PING_PLAY_SOUND = KEY_PING + ".play_sound";
+    public static final String KEY_PING_ITEM_COUNT = KEY_PING + ".item_count";
     public static final String KEY_PING_MESSAGE = KEY_PING + ".message";
     public static final String KEY_PING_DIRECTION_MESSAGE = KEY_PING + ".message_directional";
 
@@ -37,6 +37,12 @@ public class Translations {
             (translator, value, alreadyEnabled) -> !alreadyEnabled ?
                     Text.literal(String.format(translator.get(KEY_ENABLED + "." + value), translator.get(KEY_PING_PLAY_SOUND) )) :
                     Text.literal(String.format(translator.get(KEY_ALREADY_ENABLED + "." + value), translator.get(KEY_PING_PLAY_SOUND)))
+    );
+
+    public static final TranslatableDouble<Boolean, Boolean> ITEM_COUNT_ENABLED = new TranslatableDouble<>(
+            (translator, value, alreadyEnabled) -> !alreadyEnabled ?
+                    Text.literal(String.format(translator.get(KEY_ENABLED + "." + value), translator.get(KEY_PING_ITEM_COUNT) )) :
+                    Text.literal(String.format(translator.get(KEY_ALREADY_ENABLED + "." + value), translator.get(KEY_PING_ITEM_COUNT)))
     );
 
     public static final TranslatableSingle<Triple<String, Text, Vec3i>> PING_MESSAGE = new TranslatableSingle<>(
