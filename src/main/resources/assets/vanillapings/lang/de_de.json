@@ -8,8 +8,8 @@
   "vanillapings.ping.play_sound": "Ping-Ton",
   "vanillapings.ping.item_count": "Ping-Item-Menge",
 
-  "vanillapings.util.enabled.true": "%s ist aktiviert",
-  "vanillapings.util.enabled.false": "%s ist deaktiviert",
+  "vanillapings.util.enabled.true": "%s ist jetzt aktiviert",
+  "vanillapings.util.enabled.false": "%s ist jetzt deaktiviert",
   "vanillapings.util.enabled.already.true": "%s bereits aktiviert",
   "vanillapings.util.enabled.already.false": "%s bereits deaktiviert"
 }

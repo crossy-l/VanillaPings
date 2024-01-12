@@ -17,8 +17,8 @@ The mod is required on the server. But not mandatory for clients. However, using
 #### Admin commands *(only for operators, work from the console)*
 * `/vanillapings reload` to reload all [settings](#settings-file).
 * `/vanillapings removeOld` to remove pings that didn't disappear on their own ([ping-remove-old (settings)](#settings-file)).
-* `/vanillapings playSound <true|false>` to disable/enable playing sounds when a ping appears ([ping-sound (settings)](#settings-file)).
-* `/vanillapings itemCount <true|false>` to disable/enable displaying the amount of items in a ping ([ping-item-count (settings)](#settings-file)).
+* `/vanillapings sound (<true|false>)` to disable/enable playing sounds when a ping appears ([ping-sound (settings)](#settings-file)).
+* `/vanillapings itemCount (<true|false>)` to disable/enable displaying the amount of items in a ping ([ping-item-count (settings)](#settings-file)).
 
 ## Configuration
 ### Settings file

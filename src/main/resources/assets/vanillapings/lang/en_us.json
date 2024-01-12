@@ -9,8 +9,8 @@
   "vanillapings.ping.item_count": "Ping item count",
 
 
-  "vanillapings.util.enabled.true": "%s is active",
-  "vanillapings.util.enabled.false": "%s is inactive",
+  "vanillapings.util.enabled.true": "%s is now active",
+  "vanillapings.util.enabled.false": "%s is now inactive",
   "vanillapings.util.enabled.already.true": "%s already active",
   "vanillapings.util.enabled.already.false": "%s already disabled"
 }
