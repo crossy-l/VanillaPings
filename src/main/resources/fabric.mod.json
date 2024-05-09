@@ -1,39 +1,39 @@
 {
-  "schemaVersion": 1,
-  "id": "vanillapings",
-  "version": "1.9",
+	"schemaVersion": 1,
+	"id": "vanillapings",
+	"version": "1.9",
 
-  "name": "Vanilla Pings",
-  "description": "Adds simple pinging of locations and entities to nearby players in a vanilla way (using armor stands and glowing). If you use this mod on the client you can configure a hotkey for pinging. (Only works if the server has the mod installed)",
-  "authors": [
-    "CrossyL"
-  ],
+	"name": "Vanilla Pings",
+	"description": "Adds simple pinging of locations and entities to nearby players in a vanilla way (using armor stands and glowing). If you use this mod on the client you can configure a hotkey for pinging. (Only works if the server has the mod installed)",
+	"authors": [
+		"CrossyL"
+	],
 
-  "contact": {
-    "homepage": "https://github.com/crossy-l/VanillaPings",
-    "sources": "https://github.com/crossy-l/VanillaPings",
-    "issues": "https://github.com/crossy-l/VanillaPings/issues"
-  },
-  "license": "MIT License",
-  "icon": "assets/vanillapings/icon.png",
+	"contact": {
+		"homepage": "https://github.com/crossy-l/VanillaPings",
+		"sources": "https://github.com/crossy-l/VanillaPings",
+		"issues": "https://github.com/crossy-l/VanillaPings/issues"
+	},
+	"license": "MIT License",
+	"icon": "assets/vanillapings/icon.png",
 
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "com.vanillapings.VanillaPings"
-    ],
-    "client": [
-      "com.vanillapings.VanillaPingsClient"
-    ]
-  },
-  "mixins": [
-    "vanillapings.mixins.json"
-  ],
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.vanillapings.VanillaPings"
+		],
+		"client": [
+			"com.vanillapings.VanillaPingsClient"
+		]
+	},
+	"mixins": [
+		"vanillapings.mixins.json"
+	],
 
-  "depends": {
-    "fabricloader": ">=0.14.19",
-    "fabric-api": "*",
-    "minecraft": ">=1.20",
-    "java": ">=17"
-  }
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "~1.19.4",
+		"java": ">=17",
+		"fabric-api": "*"
+	}
 }

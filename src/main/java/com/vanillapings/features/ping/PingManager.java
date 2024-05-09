@@ -186,21 +186,21 @@ public class PingManager {
 
     public static String getPingDirectionArrow(double degree) {
         if(degree >= 22.5 && degree <= 67.5) {
-            return "\uD83E\uDC7D";
+            return "↗";
         } else if(degree >= 67.5 && degree <= 112.5) {
-            return "\uD83E\uDC7A";
+            return "→";
         } else if (degree >= 112.5 && degree <= 157.5) {
-            return "\uD83E\uDC7E";
+            return "↘";
         } else if(degree >= 157.5 && degree <= 202.5) {
-            return "\uD83E\uDC7B";
+            return "↓";
         } else if(degree >= 202.5 && degree <= 247.5) {
-            return "\uD83E\uDC7F";
+            return "↙";
         } else if(degree >= 247.5 && degree <= 292.5) {
-            return "\uD83E\uDC78";
+            return "←";
         } else if(degree >= 292.5 && degree <= 337.5) {
-            return "\uD83E\uDC7C";
+            return "↖";
         }
-        return "\uD83E\uDC79";
+        return "↑";
     }
 
     public static String getPingCardinalDirection(double degree) {
