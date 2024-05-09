@@ -5,6 +5,7 @@ import com.vanillapings.VanillaPings;
 import com.vanillapings.util.InputCooldown;
 import com.vanillapings.util.Triple;
 import net.minecraft.block.BlockState;
+import net.minecraft.data.DataOutput;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -15,7 +16,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.nbt.visitor.StringNbtWriter;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
@@ -30,6 +36,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class PingManager {
     @FunctionalInterface
@@ -117,11 +124,10 @@ public class PingManager {
             nbt.putBoolean("Small", true);
             NbtList nbtList = new NbtList();
             NbtCompound compound = new NbtCompound();
-            Items.AIR.getDefaultStack().writeNbt(compound);
             nbtList.add(compound);
             nbtList.add(compound);
             nbtList.add(compound);
-            VanillaPings.SETTINGS.getPingItem().getDefaultStack().writeNbt(compound);
+            compound.putString("id", Registries.ITEM.getId(VanillaPings.SETTINGS.getPingItem()).toString());
             nbtList.add(compound);
             nbt.put("ArmorItems", nbtList);
 
