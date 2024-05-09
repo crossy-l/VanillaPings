@@ -3,6 +3,7 @@
 	"package": "com.vanillapings.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
+		"ArmorStandEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

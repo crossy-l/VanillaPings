@@ -1,5 +1,6 @@
 package com.vanillapings.features.ping;
 
+import com.vanillapings.mixin.ArmorStandEntityMixin;
 import com.vanillapings.translation.Translations;
 import com.vanillapings.VanillaPings;
 import com.vanillapings.util.InputCooldown;
@@ -133,8 +134,8 @@ public class PingManager {
             entity.setInvulnerable(true);
             entity.setNoGravity(true);
             entity.setInvisible(true);
-            entity.setHideBasePlate(true);
-            entity.setShowArms(false);
+            ((ArmorStandEntityMixin)entity).invokeSetHideBasePlate(true);
+            ((ArmorStandEntityMixin)entity).invokeSetShowArms(false);
             // entity.setGlowing(true); No longer needed since glowing is now handled by the highlight parameter of the PingEntity
             world.spawnEntity(entity);
             targetEntity = entity;

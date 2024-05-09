@@ -3,8 +3,8 @@ package com.vanillapings.config;
 import com.vanillapings.translation.Translator;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class PingSettings extends Settings {
         cfg.put(KEY_PING_REMOVE_OLD_PINGS, pingRemoveOld);
         cfg.put(KEY_PING_GLOWING, pingGlowing);
         cfg.put(KEY_PING_GLOWING_FLASH, pingGlowingFlash);
-        cfg.put(KEY_PING_ITEM, Registries.ITEM.getId(pingItem).toString());
+        cfg.put(KEY_PING_ITEM, Registry.ITEM.getId(pingItem).toString());
         cfg.put(KEY_PING_PLAY_SOUND, playSound);
         super.saveSettings();
     }
@@ -92,10 +92,10 @@ public class PingSettings extends Settings {
         if(cfg.containsKey(KEY_PING_ITEM)) {
             String itemIdentifier = Objects.requireNonNull(cfg.getString(KEY_PING_ITEM));
             Identifier pingItemIdentifier = new Identifier(itemIdentifier);
-            if(!Registries.ITEM.containsId(pingItemIdentifier))
+            if(!Registry.ITEM.containsId(pingItemIdentifier))
                 pingItem = Items.BLUE_STAINED_GLASS;
             else
-                pingItem = Registries.ITEM.get(pingItemIdentifier);
+                pingItem = Registry.ITEM.get(pingItemIdentifier);
         }
 
         if(pingItemCountRange < 0)
