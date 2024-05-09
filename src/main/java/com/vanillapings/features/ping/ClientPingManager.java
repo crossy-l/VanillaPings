@@ -1,8 +1,12 @@
 package com.vanillapings.features.ping;
 
 import com.vanillapings.networking.CPingPackets;
+import com.vanillapings.networking.packet.PingC2SPacket;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.impl.networking.payload.PayloadHelper;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.math.BlockPos;
 
 public class ClientPingManager {
     /**
@@ -10,6 +14,6 @@ public class ClientPingManager {
      * The server manages a cooldown for this action.
      */
     public static void pingInFrontOfPlayer() {
-        ClientPlayNetworking.send(CPingPackets.ID_PING, PacketByteBufs.empty());
+        ClientPlayNetworking.send(new PingC2SPacket.PingPayload(new BlockPos(0, 0, 0)));
     }
 }
