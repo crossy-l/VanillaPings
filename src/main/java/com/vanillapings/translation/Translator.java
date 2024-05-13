@@ -20,9 +20,9 @@ public class Translator {
     public static Map<String, Translator> languages = new HashMap<>();
     private Map<String, String> translations;
 
-    private static void loadLanguage(String name) {
+    public static boolean loadLanguage(String name) {
         if(loadLanguageFromFile(name))
-            return;
+            return true;
         try {
             try (InputStream langStr = VanillaPings.getInstance().getClass().getClassLoader().getResourceAsStream("assets/vanillapings/lang/" + name + ".json")) {
                 JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(langStr)));
@@ -34,7 +34,9 @@ public class Translator {
             }
         } catch (Exception ex) {
             VanillaPings.LOGGER.error("Failed to load " + VanillaPings.MOD_NAME + " language files: " + ex);
+            return false;
         }
+        return true;
     }
 
     private static boolean loadLanguageFromFile(String name) {

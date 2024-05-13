@@ -1,16 +1,28 @@
 {
   "vanillapings.category": "Vanilla Pings",
   "vanillapings.reload": "Vanilla Pings reloaded successfully",
+  "vanillapings.lang": "Language",
+  "vanillapings.lang.name": "English",
+  "vanillapings.lang.fallback": "Language file couldn't be found, using previous language",
   "vanillapings.ping": "Ping",
   "vanillapings.ping.remove_old": "%d old pings removed",
   "vanillapings.ping.message": "%s pinged %2s at (x: %d, y: %d, z: %d)",
   "vanillapings.ping.message_directional": "Ping %s %d %s",
   "vanillapings.ping.play_sound": "Ping sound",
-  "vanillapings.ping.item_count": "Ping item count",
-
+  "vanillapings.ping.glowing": "Ping glowing",
+  "vanillapings.ping.glowing.flash": "Ping glowing flash",
+  "vanillapings.ping.range": "Ping range",
+  "vanillapings.ping.range.chat": "Ping chat range",
+  "vanillapings.ping.range.direction": "Ping direction information range",
+  "vanillapings.ping.cooldown": "Ping cooldown",
+  "vanillapings.ping.item": "Ping item",
+  "vanillapings.ping.item.count": "Ping item count",
+  "vanillapings.ping.item.count.range": "Ping item count range",
 
   "vanillapings.util.enabled.true": "%s is now active",
   "vanillapings.util.enabled.false": "%s is now inactive",
   "vanillapings.util.enabled.already.true": "%s already active",
-  "vanillapings.util.enabled.already.false": "%s already disabled"
+  "vanillapings.util.enabled.already.false": "%s already disabled",
+  "vanillapings.util.set": "%s set to %s",
+  "vanillapings.util.set.already": "%s is already set to %s"
 }

@@ -1,6 +1,6 @@
 # Vanilla Pings
 
-A Minecraft mod to easily ping entities and locations like in most popular shooter games. The pings show up using armor stands and have **glowing** on them. This makes it possible for the mod to be **server-side** only.
+A Minecraft mod to easily ping entities and locations like in most popular shooter games. The pings show up using armor stands and have **glowing** on them. This makes it possible for the mod to be **server-side** only. Using it on the client will add a hotkey, so it's **optional** _(Modrinth still says it's unsupported so just ignore that)_.
 
 <img src="https://cdn.modrinth.com/data/P6Y8Vr1q/images/6495baf38879941c5c0e063829f5b506142d98c1.png" alt="drawing" width="700"/>
 <img src="https://cdn.modrinth.com/data/P6Y8Vr1q/images/daafdfde862a189de9eec894368119d77f837f33.gif" alt="drawing" width="700"/>
@@ -17,15 +17,25 @@ The mod is required on the server. But not mandatory for clients. However, using
 #### Admin commands *(only for operators, work from the console)*
 * `/vanillapings reload` to reload all [settings](#settings-file).
 * `/vanillapings removeOld` to remove pings that didn't disappear on their own ([ping-remove-old (settings)](#settings-file)).
+* `/vanillapings language <name>` to set your desired language ([lang (settings)](#settings-file) more info [here](#creating-your-own-language-file)).
 * `/vanillapings sound (<true|false>)` to disable/enable playing sounds when a ping appears ([ping-sound (settings)](#settings-file)).
-* `/vanillapings itemCount (<true|false>)` to disable/enable displaying the amount of items in a ping ([ping-item-count (settings)](#settings-file)).
+* `/vanillapings cooldown <ticks>` to set the cooldown which a player needs to wait for between each ping ([ping-cooldown (settings)](#settings-file)).
+* `/vanillapings item <item>` to set the item used for the ping ([ping-item (settings)](#settings-file)).
+* `/vanillapings item count <true|false>` to disable/enable displaying the amount of items in a ping ([ping-item-count (settings)](#settings-file)).
+* `/vanillapings item count range <value>` to set the range in which items will be counted ([ping-item-count-range (settings)](#settings-file)).
+* `/vanillapings glowing (<true|false>)` to disable/enable the glowing effect pings have ([ping-glowing (settings)](#settings-file)).
+* `/vanillapings glowing flash (<true|false>)` to disable/enable the flashing effect pings have before disappearing ([ping-glowing-flash (settings)](#settings-file)).
+* `/vanillapings range <value>` to set the maximum range a player can ping from their position ([ping-max-range (settings)](#settings-file)).
+* `/vanillapings range chat <value>` to set the maximum range a player needs to be near a ping to see chat messages ([ping-chat-message-range (settings)](#settings-file)).
+* `/vanillapings range direction <value>` to set the maximum range a player needs to be near a ping to see direction messages in the action bar ([ping-direction-message-range (settings)](#settings-file)).
 
+Some more commands (especially to change settings) will follow in future versions. For now just set the settings in the settings file and reload the mod.
 ## Configuration
 ### Settings file
 For general settings use the **vanillapings.properties** file found in the ``config/vanillapings`` folder of your server or minecraft folder. Settings should be configured on the **server side** or on your **local client** if you play single player or share your world via open to lan.
 ```properties
 #vanillapings.properties
-#Mon Oct 30 13:56:50 CET 2023
+#Mon May 13 11:39:38 CEST 2024
 lang=en_us                             # Language used for ping chat messages
 ping-chat-message-range=160.0          # Range a player needs to be near a ping to see chat messages (-1=no limit, 0=disabled)
 ping-cooldown=5                        # Server side cooldown for pings sent by players in game ticks. Players ping speed using the hotkey is limited to 5 ticks per ping so that's also the default. (Note: "/ping" can be used to ping faster if the cooldown is set lower)

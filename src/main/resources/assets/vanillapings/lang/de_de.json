@@ -1,15 +1,29 @@
 {
   "vanillapings.category": "Vanilla Pings",
   "vanillapings.reload": "Vanilla Pings erfolgreich neu geladen",
+  "vanillapings.lang": "Sprache",
+  "vanillapings.lang.name": "Deutsch",
+  "vanillapings.lang.fallback": "Sprachdatei konnte nicht geladen werden. Die alte Sprache wird weiterverwendet",
   "vanillapings.ping": "Ping",
   "vanillapings.ping.remove_old": "%d alte Pings entfernt",
   "vanillapings.ping.message": "%s pingt %2s bei (x: %d, y: %d, z: %d)",
   "vanillapings.ping.message_directional": "Ping %s %d %s",
   "vanillapings.ping.play_sound": "Ping-Ton",
-  "vanillapings.ping.item_count": "Ping-Item-Menge",
+  "vanillapings.ping.glowing": "Ping-Leuchten",
+  "vanillapings.ping.glowing.flash": "Ping-Blinken",
+  "vanillapings.ping.range": "Ping-Reichweite",
+  "vanillapings.ping.range.chat": "Ping-Chat-Reichweite",
+  "vanillapings.ping.range.direction": "Ping-Richtungsanzeigenreichweite",
+  "vanillapings.ping.cooldown": "Ping-Abklingzeit",
+  "vanillapings.ping.item": "Ping-Item",
+  "vanillapings.ping.item.count": "Ping-Item-Menge",
+  "vanillapings.ping.item.count.range": "Ping-Item-Mengenreichweite",
 
   "vanillapings.util.enabled.true": "%s ist jetzt aktiviert",
   "vanillapings.util.enabled.false": "%s ist jetzt deaktiviert",
   "vanillapings.util.enabled.already.true": "%s bereits aktiviert",
-  "vanillapings.util.enabled.already.false": "%s bereits deaktiviert"
+  "vanillapings.util.enabled.already.false": "%s bereits deaktiviert",
+  "vanillapings.util.set": "%s auf %s gesetzt",
+  "vanillapings.util.set.already": "%s ist bereits auf %s gesetzt"
+
 }
