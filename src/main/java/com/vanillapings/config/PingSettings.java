@@ -138,10 +138,100 @@ public class PingSettings extends Settings {
         return pingCooldown;
     }
 
+    public boolean setLangauge(String language) {
+        if(language.equals(this.defaultLanguage)) return false;
+
+        this.defaultLanguage = language;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
     public boolean setPlaySound(boolean playSound) {
         if(playSound == this.playSound) return false;
 
         this.playSound = playSound;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
+    public boolean setGlowing(boolean glowing) {
+        if(glowing == this.pingGlowing) return false;
+
+        this.pingGlowing = glowing;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
+    public boolean setPingItem(Item item) {
+        if(item == this.pingItem) return false;
+
+        this.pingItem = item;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
+    public boolean setGlowingFlash(boolean glowingFlash) {
+        if(glowingFlash == this.pingGlowingFlash) return false;
+
+        this.pingGlowingFlash = glowingFlash;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
+    public boolean setItemCountRange(double range) {
+        if(range == this.pingItemCountRange) return false;
+
+        this.pingItemCountRange = range;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
+    public boolean setPingRange(double range) {
+        if(range == this.pingRange) return false;
+
+        this.pingRange = range;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
+    public boolean setPingChatMessageRange(double range) {
+        if(range == this.pingChatMessageRange) return false;
+
+        this.pingChatMessageRange = range;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
+    public boolean setPingDirectionMessageRange(double range) {
+        if(range == this.pingDirectionMessageRange) return false;
+
+        this.pingDirectionMessageRange = range;
+        saveSettings();
+        invokeSettingsRefreshed();
+
+        return true;
+    }
+
+    public boolean setPingCooldown(int ticks) {
+        if(ticks == this.pingCooldown) return false;
+
+        this.pingCooldown = ticks;
         saveSettings();
         invokeSettingsRefreshed();
 
