@@ -2,9 +2,13 @@ package com.vanillapings.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.vanillapings.VanillaPings;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import com.vanillapings.features.ping.PingManager;
+import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -29,14 +33,52 @@ public class VanillaPingsCommands {
                             .executes(ReloadCommand::Reload))
                         .then(literal("removeOld")
                                 .executes(RemoveCommand::removeOldPings))
+                        .then(literal("language")
+                                .then(literal("en_us")
+                                        .executes(ctx -> LanguageCommand.setLanguage(ctx, "en_us")))
+                                .then(literal("de_de")
+                                    .executes(ctx -> LanguageCommand.setLanguage(ctx, "de_de")))
+                                .then(argument("custom", StringArgumentType.word())
+                                        .executes(ctx -> LanguageCommand.setLanguage(ctx, StringArgumentType.getString(ctx, "custom"))))
+                        )
                         .then(literal("sound")
                                 .executes(ctx -> SoundCommand.setSound(ctx, !VanillaPings.SETTINGS.isPlaySound()))
                                 .then(argument("value", BoolArgumentType.bool())
                                         .executes(ctx -> SoundCommand.setSound(ctx, BoolArgumentType.getBool(ctx, "value")))))
-                        .then(literal("itemCount")
-                                .executes(ctx -> ItemCountCommand.setItemCount(ctx, !VanillaPings.SETTINGS.isPingItemCount()))
+                        .then(literal("glowing")
+                                .executes(ctx -> GlowingCommand.setGlowing(ctx, !VanillaPings.SETTINGS.isPingGlowing()))
                                 .then(argument("value", BoolArgumentType.bool())
-                                        .executes(ctx -> ItemCountCommand.setItemCount(ctx, BoolArgumentType.getBool(ctx, "value")))))
+                                        .executes(ctx -> GlowingCommand.setGlowing(ctx, BoolArgumentType.getBool(ctx, "value"))))
+                                .then(literal("flash")
+                                        .executes(ctx -> GlowingCommand.setGlowingFlash(ctx, !VanillaPings.SETTINGS.isPingGlowingFlash()))
+                                        .then(argument("value", BoolArgumentType.bool())
+                                                .executes(ctx -> GlowingCommand.setGlowingFlash(ctx, BoolArgumentType.getBool(ctx, "value")))))
+                        )
+                        .then(literal("item")
+                                .then(argument("item", ItemStackArgumentType.itemStack(registryAccess))
+                                        .executes(ctx -> ItemCommand.setItem(ctx, ItemStackArgumentType.getItemStackArgument(ctx, "item").getItem())))
+                                .then(literal("count")
+                                        .executes(ctx -> ItemCommand.setItemCount(ctx, !VanillaPings.SETTINGS.isPingItemCount()))
+                                        .then(argument("value", BoolArgumentType.bool())
+                                                .executes(ctx -> ItemCommand.setItemCount(ctx, BoolArgumentType.getBool(ctx, "value"))))
+                                        .then(literal("range")
+                                                .then(argument("value", DoubleArgumentType.doubleArg())
+                                                        .executes(ctx -> ItemCommand.setItemCountRange(ctx, DoubleArgumentType.getDouble(ctx, "value")))))
+                                )
+                        )
+                        .then(literal("range")
+                            .then(argument("value", DoubleArgumentType.doubleArg())
+                                    .executes(ctx -> RangeCommand.setRange(ctx, DoubleArgumentType.getDouble(ctx, "value"))))
+                            .then(literal("chat")
+                                .then(argument("value", DoubleArgumentType.doubleArg())
+                                        .executes(ctx -> RangeCommand.setChatRange(ctx, DoubleArgumentType.getDouble(ctx, "value")))))
+                            .then(literal("direction")
+                                    .then(argument("value", DoubleArgumentType.doubleArg())
+                                            .executes(ctx -> RangeCommand.setDirectionMessageRange(ctx, DoubleArgumentType.getDouble(ctx, "value")))))
+                        )
+                        .then(literal("cooldown")
+                                .then(argument("ticks", IntegerArgumentType.integer())
+                                        .executes(ctx -> CooldownCommand.setPingCooldown(ctx, IntegerArgumentType.getInteger(ctx, "ticks")))))
         ));
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
                 literal("ping")

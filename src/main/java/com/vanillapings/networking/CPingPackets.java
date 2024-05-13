@@ -1,11 +1,8 @@
 package com.vanillapings.networking;
 
-import com.vanillapings.VanillaPings;
-import com.vanillapings.features.ping.PingManager;
 import com.vanillapings.networking.packet.PingC2SPacket;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.util.Identifier;
 
 public class CPingPackets {
 
