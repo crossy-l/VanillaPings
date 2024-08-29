@@ -91,7 +91,7 @@ public class PingSettings extends Settings {
         }
         if(cfg.containsKey(KEY_PING_ITEM)) {
             String itemIdentifier = Objects.requireNonNull(cfg.getString(KEY_PING_ITEM));
-            Identifier pingItemIdentifier = new Identifier(itemIdentifier);
+            Identifier pingItemIdentifier = Identifier.of(itemIdentifier);
             if(!Registries.ITEM.containsId(pingItemIdentifier))
                 pingItem = Items.BLUE_STAINED_GLASS;
             else

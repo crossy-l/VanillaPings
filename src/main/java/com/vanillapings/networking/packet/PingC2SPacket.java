@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class PingC2SPacket {
-    public static final Identifier ID_PING = new Identifier(VanillaPings.MOD_NAME.toLowerCase(), "ping");
+    public static final Identifier ID_PING = Identifier.of(VanillaPings.MOD_NAME.toLowerCase(), "ping");
 
     public record PingPayload(BlockPos blockPos) implements CustomPayload {
         public static final Id<PingPayload> ID = CustomPayload.id(ID_PING.getPath());

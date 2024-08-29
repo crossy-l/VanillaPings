@@ -4,7 +4,7 @@
 	"version": "1.10",
 
 	"name": "Vanilla Pings",
-	"description": "Adds simple pinging of locations and entities to nearby players in a vanilla way (using armor stands and glowing). If you use this mod on the client you can configure a hotkey for pinging. (Only works if the server has the mod installed)",
+	"description": "Adds customizable pinging of locations and entities to nearby players in a vanilla way (using armor stands and glowing). If you use this mod on the client you can configure a hotkey for pinging. (Only works if the server has the mod installed)",
 	"authors": [
 		"CrossyL"
 	],
@@ -33,7 +33,7 @@
 	"depends": {
 		"fabricloader": ">=0.14.19",
 		"fabric-api": "*",
-		"minecraft": ">=1.20",
+		"minecraft": ">=1.21",
 		"java": ">=17"
 	}
 }
