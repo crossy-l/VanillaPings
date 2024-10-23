@@ -73,7 +73,7 @@ public class PingedEntity {
         }
 
         if(kill)
-            entity.kill();
+            entity.kill(entity.getServer().getWorld(entity.getWorld().getRegistryKey()));
     }
 
     private boolean shouldInterfereWithGlowing() {

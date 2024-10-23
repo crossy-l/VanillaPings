@@ -6,10 +6,7 @@ import com.vanillapings.util.InputCooldown;
 import com.vanillapings.util.Triple;
 import net.minecraft.block.BlockState;
 import net.minecraft.data.DataOutput;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -131,7 +128,7 @@ public class PingManager {
             nbtList.add(compound);
             nbt.put("ArmorItems", nbtList);
 
-            ArmorStandEntity entity = Objects.requireNonNull(EntityType.ARMOR_STAND.create(world));
+            ArmorStandEntity entity = Objects.requireNonNull(EntityType.ARMOR_STAND.create(world, SpawnReason.COMMAND));
             entity.readCustomDataFromNbt(nbt);
             entity.setCustomName(noPingText);
 
@@ -159,7 +156,7 @@ public class PingManager {
 
             if(pingEntity != null && (distance < VanillaPings.SETTINGS.getPingChatMessageRange() || VanillaPings.SETTINGS.hasInfinitePingChatMessageRange())) {
                 var pingMessage = Translations.PING_MESSAGE.constructMessage(new Triple<>(player.getName().getString(), getTextForEntity(pingEntity), new Vec3i((int) Math.round(pos.x), (int)Math.round(pos.y), (int)Math.round(pos.z))));
-                playerEntity.sendMessage(pingMessage);
+                playerEntity.sendMessage(pingMessage, true);
             }
         });
 
@@ -444,7 +441,7 @@ public class PingManager {
                     remove.add(entity);
             });
             removed += remove.size();
-            remove.forEach(Entity::kill);
+            remove.forEach(e -> e.kill(world));
         }
         return removed;
     }
