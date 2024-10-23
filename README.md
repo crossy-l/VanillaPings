@@ -2,12 +2,12 @@
 
 A Minecraft mod to easily ping entities and locations like in most popular shooter games. The pings show up using armor stands and have **glowing** on them. This makes it possible for the mod to be **server-side** only. Using it on the client will add a hotkey, so it's **optional** _(Modrinth still says it's unsupported so just ignore that)_.
 
-<img src="https://cdn.modrinth.com/data/P6Y8Vr1q/images/6495baf38879941c5c0e063829f5b506142d98c1.png" alt="drawing" width="700"/>
+<img src="https://cdn.modrinth.com/data/P6Y8Vr1q/images/3217cf61ecadc4927ce902033af7a80c5f4c551c.png" alt="drawing" width="700"/>
 <img src="https://cdn.modrinth.com/data/P6Y8Vr1q/images/daafdfde862a189de9eec894368119d77f837f33.gif" alt="drawing" width="700"/>
 
 It's possible to customize the language used for messages (see: [custom messages](#custom-messages)).
 
-The mod uses the game rules `sendCommandFeedback` and `logAdminCommands` for command feedback and logging like vanilla commands. Right now only on the `/vanillapings reload` command.
+The mod uses the game rules `sendCommandFeedback` and `logAdminCommands` for command feedback and logging (just like vanilla commands) on all [admin commands](admin-commands-only-for-operators-work-from-the-console).
 
 ## Usage
 The mod is required on the server. But not mandatory for clients. However, using it on the client adds a customizable hotkey for pinging. **Admin commands** behave like vanilla operator commands and **can only be run by operators**.
@@ -29,7 +29,6 @@ The mod is required on the server. But not mandatory for clients. However, using
 * `/vanillapings range chat <value>` to set the maximum range a player needs to be near a ping to see chat messages ([ping-chat-message-range (settings)](#settings-file)).
 * `/vanillapings range direction <value>` to set the maximum range a player needs to be near a ping to see direction messages in the action bar ([ping-direction-message-range (settings)](#settings-file)).
 
-Some more commands (especially to change settings) will follow in future versions. For now just set the settings in the settings file and reload the mod.
 ## Configuration
 ### Settings file
 For general settings use the **vanillapings.properties** file found in the ``config/vanillapings`` folder of your server or minecraft folder. Settings should be configured on the **server side** or on your **local client** if you play single player or share your world via open to lan.
@@ -59,5 +58,7 @@ When a player pings an entity the server sends a message with information about 
 * Copy the **en_us.json** out of the GitHub repo found in the resource folder into your local ``config/vanillapings/lang`` folder. *You might have to create it if it doesn't exist.*
 * Fill out the json in your language and select the language in the config **lang** field. E.g. if your file is named **fr_fr.json** you have to specify **fr_fr** as the **lang** in the **vanillapings.properties** config file.
 * Restart your server or use ``/vanillapings reload`` to reload the configuration.
+
+You may also select your custom language using the new ``/vanillapings language`` command.
 
 *In spectator mode you can see the invisible armor stand wearing the highlighted block (in case you're curious).*
