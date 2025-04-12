@@ -14,6 +14,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -31,6 +32,6 @@ public class PingC2SPacket {
     }
 
     public static void receive(PingPayload payload, ServerPlayNetworking.Context context) {
-        context.player().getServer().execute(() -> PingManager.pingWithCooldown(context.player()));
+        Objects.requireNonNull(context.player().getWorld().getGameInstance()).getServer().execute(() -> PingManager.pingWithCooldown(context.player()));
     }
 }

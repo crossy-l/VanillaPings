@@ -11,8 +11,10 @@ import com.vanillapings.features.ping.PingManager;
 import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameRules;
@@ -91,22 +93,24 @@ public class VanillaPingsCommands {
     }
 
     public static void broadcastCommandUsageToOperators(Text message, ServerCommandSource source) {
-        MinecraftServer server = source.getServer();
-        GameRules rules = server.getGameRules();
+        MinecraftServer server = source.getWorld().getGameInstance().getServer();
+        GameRules rules = source.getWorld().getGameRules();
+        PlayerManager playerManager = source.getWorld().getGameInstance().getPlayerManager();
 
         if(!(source.getEntity() instanceof LivingEntity) && !source.getName().equals("Server") && !rules.getBoolean(GameRules.COMMAND_BLOCK_OUTPUT))
             return;
 
-        List<ServerPlayerEntity> operators = server.getPlayerManager().getPlayerList().stream().filter(player -> player.hasPermissionLevel(server.getOpPermissionLevel())).toList();
+
+        List<ServerPlayerEntity> operators = playerManager.getPlayerList().stream().filter(player -> player.hasPermissionLevel(server.getOpPermissionLevel())).toList();
 
         Text mMessage = Text.literal(String.format("[%s: ", source.getName())).append(message).append(Text.literal("]")).formatted(Formatting.GRAY).formatted(Formatting.ITALIC);
         UUID sourceId = source.getEntity() != null ? source.getEntity().getUuid() : null;
-        if(server.getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK))
+        if(rules.getBoolean(GameRules.SEND_COMMAND_FEEDBACK))
             operators.forEach(player -> {
                 if(!player.getUuid().equals(sourceId))
                     player.sendMessage(mMessage);
             });
-        if(server.getGameRules().getBoolean(GameRules.LOG_ADMIN_COMMANDS) && !source.getName().equals("Server"))
+        if(rules.getBoolean(GameRules.LOG_ADMIN_COMMANDS) && !source.getName().equals("Server"))
             server.sendMessage(mMessage);
     }
 
@@ -122,6 +126,6 @@ public class VanillaPingsCommands {
 
     public static boolean isCommandFeedbackAllowed(ServerCommandSource source) {
         boolean isServer = !(source.getEntity() instanceof LivingEntity) && source.getName().equals("Server");
-        return source.getServer().getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK) || isServer;
+        return source.getWorld().getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK) || isServer;
     }
 }

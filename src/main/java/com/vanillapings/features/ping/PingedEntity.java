@@ -9,6 +9,8 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.Objects;
+
 public class PingedEntity {
     private boolean dead = false;
     private final int maxAge;
@@ -73,7 +75,7 @@ public class PingedEntity {
         }
 
         if(kill)
-            entity.kill(entity.getServer().getWorld(entity.getWorld().getRegistryKey()));
+            entity.kill(Objects.requireNonNull(entity.getWorld().getGameInstance()).getWorld(entity.getWorld().getRegistryKey()));
     }
 
     private boolean shouldInterfereWithGlowing() {

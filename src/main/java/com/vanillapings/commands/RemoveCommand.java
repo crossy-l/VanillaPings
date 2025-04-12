@@ -8,7 +8,7 @@ import net.minecraft.server.command.ServerCommandSource;
 
 public class RemoveCommand {
     public static int removeOldPings(CommandContext<ServerCommandSource> ctx) {
-        int removed = PingManager.removeOldPings(ctx.getSource().getServer());
+        int removed = PingManager.removeOldPings(ctx.getSource().getWorld().getGameInstance());
         VanillaPingsCommands.sendCommandFeedBack(Translations.REMOVED_OLD.constructMessage(removed), ctx.getSource());
         return Command.SINGLE_SUCCESS;
     }

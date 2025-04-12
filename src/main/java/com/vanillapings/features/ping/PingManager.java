@@ -19,6 +19,7 @@ import net.minecraft.nbt.NbtString;
 import net.minecraft.nbt.visitor.StringNbtWriter;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.GameInstance;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
@@ -422,12 +423,12 @@ public class PingManager {
 
     /**
      * Loops over all loaded entities and removes them if they are a leftover ping armor stand.
-     * @param server The server to use.
+     * @param gameInstance The instance to use.
      * @return The amount of old pings removed.
      */
-    public static int removeOldPings(MinecraftServer server) {
+    public static int removeOldPings(GameInstance gameInstance) {
         int removed = 0;
-        for (ServerWorld world : server.getWorlds()) {
+        for (ServerWorld world : gameInstance.getWorlds()) {
             List<Entity> remove = new ArrayList<>();
             world.iterateEntities().forEach(entity -> {
                 if(entity != null && entity.getCustomName() != null && entity.getCustomName().equals(noPingText) && entities.stream().noneMatch(pingedEntity -> pingedEntity.getEntity().equals(entity)))
@@ -460,7 +461,7 @@ public class PingManager {
             return;
 
         if(clearOldPingCooldown.isReady()) {
-            removeOldPings(server);
+            removeOldPings(Objects.requireNonNull(server.getGameInstance()));
             clearOldPingCooldown.triggerCooldown();
         }
         clearOldPingCooldown.tick();
