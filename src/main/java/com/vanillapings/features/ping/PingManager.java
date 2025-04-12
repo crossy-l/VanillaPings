@@ -119,18 +119,11 @@ public class PingManager {
             NbtCompound nbt = new NbtCompound();
             nbt.putBoolean("Marker", true);
             nbt.putBoolean("Small", true);
-            NbtList nbtList = new NbtList();
-            NbtCompound compound = new NbtCompound();
-            nbtList.add(compound);
-            nbtList.add(compound);
-            nbtList.add(compound);
-            compound.putString("id", Registries.ITEM.getId(VanillaPings.SETTINGS.getPingItem()).toString());
-            nbtList.add(compound);
-            nbt.put("ArmorItems", nbtList);
 
             ArmorStandEntity entity = Objects.requireNonNull(EntityType.ARMOR_STAND.create(world, SpawnReason.COMMAND));
             entity.readCustomDataFromNbt(nbt);
             entity.setCustomName(noPingText);
+            entity.equipStack(EquipmentSlot.HEAD, new ItemStack(VanillaPings.SETTINGS.getPingItem()));
 
             entity.setPos(pos.getX(), pos.getY() - .8, pos.getZ());
             entity.setInvulnerable(true);
