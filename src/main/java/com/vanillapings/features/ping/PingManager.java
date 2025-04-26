@@ -156,7 +156,7 @@ public class PingManager {
 
             if(pingEntity != null && (distance < VanillaPings.SETTINGS.getPingChatMessageRange() || VanillaPings.SETTINGS.hasInfinitePingChatMessageRange())) {
                 var pingMessage = Translations.PING_MESSAGE.constructMessage(new Triple<>(player.getName().getString(), getTextForEntity(pingEntity), new Vec3i((int) Math.round(pos.x), (int)Math.round(pos.y), (int)Math.round(pos.z))));
-                playerEntity.sendMessage(pingMessage, true);
+                playerEntity.sendMessage(pingMessage, false);
             }
         });
 
