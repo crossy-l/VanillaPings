@@ -1,24 +1,16 @@
 package com.vanillapings.features.ping;
 
+import com.vanillapings.mixin.ArmorStandEntityAccessor;
 import com.vanillapings.translation.Translations;
 import com.vanillapings.VanillaPings;
 import com.vanillapings.util.InputCooldown;
 import com.vanillapings.util.Triple;
 import net.minecraft.block.BlockState;
-import net.minecraft.data.DataOutput;
 import net.minecraft.entity.*;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.nbt.visitor.StringNbtWriter;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
@@ -33,7 +25,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 public class PingManager {
     @FunctionalInterface
@@ -116,23 +107,32 @@ public class PingManager {
             kill = false;
             targetEntity = pingEntity;
         } else {
-            NbtCompound nbt = new NbtCompound();
-            nbt.putBoolean("Marker", true);
-            nbt.putBoolean("Small", true);
+            ArmorStandEntity entity = EntityType.ARMOR_STAND.spawn(
+                    (ServerWorld) world,
+                    armorStand -> {
+                        var accessor = (ArmorStandEntityAccessor) armorStand;
+                        accessor.invokeSetMarker(true);
+                        accessor.invokeSetSmall(true);
+                        armorStand.setInvisible(true);
+                        armorStand.setNoGravity(true);
+                        armorStand.setInvulnerable(true);
+                        armorStand.setHideBasePlate(true);
+                        armorStand.setShowArms(false);
+                        armorStand.setCustomName(noPingText);
+                        armorStand.equipStack(EquipmentSlot.HEAD, new ItemStack(VanillaPings.SETTINGS.getPingItem()));
+                        armorStand.setPos(pos.getX(), pos.getY() - 0.8, pos.getZ());
+                    },
+                    BlockPos.ofFloored(pos),
+                    SpawnReason.COMMAND,
+                    false,  // alignPosition
+                    false  // invertY
+            );
 
-            ArmorStandEntity entity = Objects.requireNonNull(EntityType.ARMOR_STAND.create(world, SpawnReason.COMMAND));
-            entity.readCustomDataFromNbt(nbt);
-            entity.setCustomName(noPingText);
-            entity.equipStack(EquipmentSlot.HEAD, new ItemStack(VanillaPings.SETTINGS.getPingItem()));
+            if(entity == null) {
+                VanillaPings.LOGGER.error("Couldn't spawn armor stand for ping. This is not intended behaviour.");
+                return;
+            }
 
-            entity.setPos(pos.getX(), pos.getY() - .8, pos.getZ());
-            entity.setInvulnerable(true);
-            entity.setNoGravity(true);
-            entity.setInvisible(true);
-            entity.setHideBasePlate(true);
-            entity.setShowArms(false);
-            // entity.setGlowing(true); No longer needed since glowing is now handled by the highlight parameter of the PingEntity
-            world.spawnEntity(entity);
             targetEntity = entity;
         }
 
@@ -363,7 +363,7 @@ public class PingManager {
      * @return The {@link Vec3d} of the raycast hit or null if nothing is hit.
      */
     public static @Nullable Vec3d exactRaycast(Entity sourceEntity, boolean includeFluids, double maxDistance) {
-        World world = sourceEntity.getEntityWorld();
+        World world = sourceEntity.getWorld();
 
         Vec3d playerPos = sourceEntity.getCameraPosVec(1.0F);
         Vec3d raycastDir = sourceEntity.getRotationVec(1.0F);

@@ -2,7 +2,9 @@
 	"required": true,
 	"package": "com.vanillapings.mixin",
 	"compatibilityLevel": "JAVA_21",
-	"mixins": [],
+	"mixins": [
+		"ArmorStandEntityAccessor"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	}
