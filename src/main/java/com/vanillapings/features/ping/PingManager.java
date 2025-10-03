@@ -62,8 +62,8 @@ public class PingManager {
         @Nullable Entity targetEntity = null;
 
         @Nullable Vec3d pos = fastRaycast(player, isNotInWater, VanillaPings.SETTINGS.getPingRange());
-        if(pos != null && pos.distanceTo(player.getPos()) < 200) {
-            @Nullable Vec3d specificPos = exactRaycast(player, isNotInWater, pos.distanceTo(player.getPos()) + 25);
+        if(pos != null && pos.distanceTo(player.getEntityPos()) < 200) {
+            @Nullable Vec3d specificPos = exactRaycast(player, isNotInWater, pos.distanceTo(player.getEntityPos()) + 25);
             if(specificPos != null)
                 pos = specificPos;
         }
@@ -74,7 +74,7 @@ public class PingManager {
             targetEntity = result.entity;
             pos = result.position;
         } else if(pos != null && result != null) {
-            if(result.position.distanceTo(player.getPos()) < pos.distanceTo(player.getPos())) {
+            if(result.position.distanceTo(player.getEntityPos()) < pos.distanceTo(player.getEntityPos())) {
                 pos = result.position;
                 targetEntity = result.entity;
             }
@@ -83,10 +83,10 @@ public class PingManager {
             return;
 
         if(customHandle != null) {
-            customHandle.ping(pos, targetEntity, player, player.getWorld());
+            customHandle.ping(pos, targetEntity, player, player.getEntityWorld());
             return;
         }
-        pingAtPosition(pos, targetEntity, player, player.getWorld());
+        pingAtPosition(pos, targetEntity, player, player.getEntityWorld());
     }
 
     /**
@@ -138,10 +138,10 @@ public class PingManager {
 
         // Send ping message
         world.getPlayers().forEach(playerEntity -> {
-            Vec3d playerPos = playerEntity.getPos();
+            Vec3d playerPos = playerEntity.getEntityPos();
             int distance = (int)Math.floor(new Vec3d(pos.x - playerPos.x, 0, pos.z - playerPos.z).length());
             if(distance < VanillaPings.SETTINGS.getPingDirectionMessageRange() || VanillaPings.SETTINGS.hasInfinitePingDirectionMessageRange()) {
-                double degree = getDegreeDirectionToPing(pos, playerEntity.getPos());
+                double degree = getDegreeDirectionToPing(pos, playerEntity.getEntityPos());
                 double relDegree = getRelativeDegree(degree, playerEntity.getYaw());
                 var pingDirMessage = Translations.PING_DIRECTION_MESSAGE.constructMessage(new Triple<>(distance, getPingDirectionArrow(relDegree), getPingCardinalDirection(degree)));
                 playerEntity.sendMessage(pingDirMessage, true);
@@ -223,7 +223,7 @@ public class PingManager {
             MutableText completeText = (MutableText) itemEntity.getStack().toHoverableText();
 
             if(VanillaPings.SETTINGS.isPingItemCount() && VanillaPings.SETTINGS.getPingItemCountRange() != 0) {
-                int amount = countStackableItemsInRange(itemEntity.getWorld(), itemEntity.getPos(), VanillaPings.SETTINGS.getPingItemCountRange(), itemEntity.getStack());
+                int amount = countStackableItemsInRange(itemEntity.getEntityWorld(), itemEntity.getEntityPos(), VanillaPings.SETTINGS.getPingItemCountRange(), itemEntity.getStack());
                 if(amount > 1) {
                     MutableText amountText = (MutableText) Text.of(String.format(" (%dx)", amount));
                     completeText.append(amountText);
@@ -319,7 +319,7 @@ public class PingManager {
         double y = startPos.y;
         double z = startPos.z;
 
-        World world = sourceEntity.getWorld();
+        World world = sourceEntity.getEntityWorld();
 
         double distance = 0.0;
         Vec3d prevPos = startPos;
@@ -363,7 +363,7 @@ public class PingManager {
      * @return The {@link Vec3d} of the raycast hit or null if nothing is hit.
      */
     public static @Nullable Vec3d exactRaycast(Entity sourceEntity, boolean includeFluids, double maxDistance) {
-        World world = sourceEntity.getWorld();
+        World world = sourceEntity.getEntityWorld();
 
         Vec3d playerPos = sourceEntity.getCameraPosVec(1.0F);
         Vec3d raycastDir = sourceEntity.getRotationVec(1.0F);
@@ -393,7 +393,7 @@ public class PingManager {
         @Nullable Vec3d pos = null;
         @Nullable Entity hitEntity = null;
 
-        for (Entity entity : sourceEntity.getWorld().getOtherEntities(sourceEntity, searchBox)) {
+        for (Entity entity : sourceEntity.getEntityWorld().getOtherEntities(sourceEntity, searchBox)) {
             Box entityBox = entity.getBoundingBox().expand(entity.getTargetingMargin());
             Optional<Vec3d> hitResult = entityBox.raycast(start, end);
 

@@ -73,7 +73,7 @@ public class PingedEntity {
         }
 
         if(kill)
-            entity.kill(entity.getServer().getWorld(entity.getWorld().getRegistryKey()));
+            entity.kill((ServerWorld) entity.getEntityWorld());
     }
 
     private boolean shouldInterfereWithGlowing() {
@@ -89,14 +89,14 @@ public class PingedEntity {
     private void audibilize() {
 
         if(soundAge == 0)
-            entity.getWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL.value(), SoundCategory.PLAYERS, 10f, 1);
+            entity.getEntityWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL.value(), SoundCategory.PLAYERS, 10f, 1);
         if(soundAge == 5)
-            entity.getWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_BELL.value(), SoundCategory.PLAYERS, 10f, 1);
+            entity.getEntityWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_BELL.value(), SoundCategory.PLAYERS, 10f, 1);
         if(soundAge == 7)
-            entity.getWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 10f, 1.5f);
+            entity.getEntityWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 10f, 1.5f);
 
         if(age >= maxAge) {
-            entity.getWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 10f, 1.25f);
+            entity.getEntityWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 10f, 1.25f);
         }
 
         soundAge++;
@@ -117,8 +117,8 @@ public class PingedEntity {
         entity.setYaw(rotation);
 
         if(age >= maxAge) {
-            ((ServerWorld)entity.getWorld()).spawnParticles(ParticleTypes.FIREWORK, entity.getX(), entity.getY() + 1.2, entity.getZ(), 10, 0, 0, 0, 0d);
-            ((ServerWorld)entity.getWorld()).spawnParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY() + 1.10, entity.getZ(), 10, 0, 0, 0, 0d);
+            ((ServerWorld)entity.getEntityWorld()).spawnParticles(ParticleTypes.FIREWORK, entity.getX(), entity.getY() + 1.2, entity.getZ(), 10, 0, 0, 0, 0d);
+            ((ServerWorld)entity.getEntityWorld()).spawnParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY() + 1.10, entity.getZ(), 10, 0, 0, 0, 0d);
         }
     }
 
