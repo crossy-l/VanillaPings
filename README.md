@@ -12,6 +12,14 @@ The mod uses the game rules `sendCommandFeedback` and `logAdminCommands` for com
 ## Usage
 The mod is required on the server. But not mandatory for clients. However, using it on the client adds a customizable hotkey for pinging. **Admin commands** behave like vanilla operator commands and **can only be run by operators**.
 
+### 🎮 Client-side Hotkey (Optional)
+Using it on the client adds a customizable hotkey for pinging.
+* **Default Key:** By default, the hotkey to ping is **Z**.
+* **How to Configure:** This key can be changed at any time in the standard Minecraft controls menu (`Options...` > `Controls...` > `Key Binds...`) under the **"Vanilla Pings"** category.
+
+
+### ⌨️ Commands
+
 #### Public commands *(can be run by everyone)*
 * `/ping` to ping the block or any entity in front of you
 #### Admin commands *(only for operators, work from the console)*
