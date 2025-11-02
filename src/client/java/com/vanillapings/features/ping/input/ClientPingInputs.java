@@ -15,7 +15,7 @@ public class ClientPingInputs {
     private static final InputCooldown inputCooldown = new InputCooldown(5);
     public static void register() {
         pingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                Translations.KEY_PING,
+                Identifier.of(Translations.KEY_PING).toTranslationKey(),
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_Z,
                 KeyBinding.Category.create(Identifier.of(Translations.KEY_CATEGORY))
