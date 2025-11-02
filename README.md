@@ -1,7 +1,6 @@
 # Vanilla Pings
 
-A Minecraft mod to easily ping entities and locations like in most popular shooter games. The pings show up using armor stands and have **glowing** on them. This makes it possible for the mod to be **server-side** only. Using it on the client will add a hotkey, so it's **optional** _(Modrinth still says it's unsupported so just ignore that)_.
-
+A Minecraft mod to easily ping entities and locations like in most popular shooter games. The pings show up using armor stands and have **glowing** on them. This makes it possible for the mod to be server-side only. Using it on the client will **add a hotkey**.
 <img src="https://cdn.modrinth.com/data/P6Y8Vr1q/images/3217cf61ecadc4927ce902033af7a80c5f4c551c.png" alt="drawing" width="700"/>
 <img src="https://cdn.modrinth.com/data/P6Y8Vr1q/images/daafdfde862a189de9eec894368119d77f837f33.gif" alt="drawing" width="700"/>
 
@@ -12,13 +11,13 @@ The mod uses the game rules `sendCommandFeedback` and `logAdminCommands` for com
 ## Usage
 The mod is required on the server. But not mandatory for clients. However, using it on the client adds a customizable hotkey for pinging. **Admin commands** behave like vanilla operator commands and **can only be run by operators**.
 
-### 🎮 Client-side Hotkey (Optional)
+### Client-side Hotkey (Optional)
 Using it on the client adds a customizable hotkey for pinging.
-* **Default Key:** By default, the hotkey to ping is **Z**.
-* **How to Configure:** This key can be changed at any time in the standard Minecraft controls menu (`Options...` > `Controls...` > `Key Binds...`) under the **"Vanilla Pings"** category.
+* **Default Key:** By default, the hotkey to ping is **Z** on US Keyboards.
+* **Configure:** Change at any time in the standard Minecraft controls menu (`Options...` > `Controls...` > `Key Binds...`) under the **"Vanilla Pings"** category.
 
 
-### ⌨️ Commands
+### Commands
 
 #### Public commands *(can be run by everyone)*
 * `/ping` to ping the block or any entity in front of you
