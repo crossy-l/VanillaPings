@@ -1,75 +1,106 @@
 package com.vanillapings.translation;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.vanillapings.VanillaPings;
 import com.vanillapings.config.FileConfig;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class Translator {
     public static final String DEFAULT_LANGUAGE = "en_us";
     public static Map<String, Translator> languages = new HashMap<>();
+    private static final String RESOURCE_BASE = "assets/vanillapings/lang";
     private Map<String, String> translations;
 
     public static boolean loadLanguage(String name) {
-        if(loadLanguageFromFile(name))
+        if (tryLoadFromFile(name))
             return true;
-        try {
-            try (InputStream langStr = VanillaPings.getInstance().getClass().getClassLoader().getResourceAsStream("assets/vanillapings/lang/" + name + ".json")) {
-                JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(langStr)));
-                Translator translator = new Translator();
-                Type type = new TypeToken<Map<String, String>>(){}.getType();
-                Gson gson = new Gson();
-                translator.translations = gson.fromJson(reader, type);
-                languages.put(name, translator);
-            }
-        } catch (Exception ex) {
-            VanillaPings.LOGGER.error("Failed to load " + VanillaPings.MOD_NAME + " language files: " + ex);
-            return false;
-        }
-        return true;
+
+        return tryLoadFromClasspath(name);
     }
 
-    private static boolean loadLanguageFromFile(String name) {
-        try {
-            File langFile = new File(FileConfig.CONFIG_FOLDER + "/lang/" + name + ".json");
-            try (InputStream langStr = new FileInputStream(langFile)) {
-                JsonReader reader = new JsonReader(new InputStreamReader(langStr, StandardCharsets.UTF_8));
-                Translator translator = new Translator();
-                Type type = new TypeToken<Map<String, String>>(){}.getType();
-                Gson gson = new Gson();
-                translator.translations = gson.fromJson(reader, type);
-                languages.put(name, translator);
-                return true;
+    private static boolean tryLoadFromClasspath(String name) {
+        String resource = RESOURCE_BASE + "/" + name + ".json";
+
+        try (InputStream in = VanillaPings.class.getClassLoader().getResourceAsStream(resource)) {
+            if (in == null) {
+                VanillaPings.LOGGER.error(
+                        "Failed to load {} language '{}': resource '{}' not found on classpath.",
+                        VanillaPings.MOD_NAME, name, resource
+                );
+                return false;
             }
-        } catch (Exception ex) {
-            if(ex instanceof FileNotFoundException)
-                VanillaPings.LOGGER.info("No custom language file found. Using default");
-            else
-                VanillaPings.LOGGER.error("Failed to load " + VanillaPings.MOD_NAME + " custom language file for '" + name + "'. Error: " + ex);
+
+            return loadIntoRegistry(name, in);
+        } catch (IOException | JsonParseException ex) {
+            VanillaPings.LOGGER.error(
+                    "Failed to load {} language '{}' from classpath.",
+                    VanillaPings.MOD_NAME, name, ex
+            );
+            return false;
         }
-        return false;
+    }
+
+    private static boolean tryLoadFromFile(String name) {
+        Path file = Paths.get(FileConfig.CONFIG_FOLDER, "lang", name + ".json");
+
+        if (!Files.exists(file)) {
+            VanillaPings.LOGGER.info("No custom language file found for '{}'", name);
+            return false;
+        }
+
+        try (InputStream in = Files.newInputStream(file)) {
+            return loadIntoRegistry(name, in);
+        } catch (IOException | JsonParseException ex) {
+            VanillaPings.LOGGER.error(
+                    "Failed to load {} custom language file for '{}'",
+                    VanillaPings.MOD_NAME, name, ex
+            );
+            return false;
+        }
+    }
+
+    private static boolean loadIntoRegistry(String languageName, InputStream in) throws IOException {
+        try (InputStreamReader isr = new InputStreamReader(in, StandardCharsets.UTF_8);
+             JsonReader reader = new JsonReader(isr)) {
+
+            Translator translator = new Translator();
+            Gson gson = new Gson();
+            translator.translations = gson.fromJson(reader, new TypeToken<Map<String, String>>() {}.getType());
+            languages.put(languageName, translator);
+            return true;
+        }
     }
 
     public String get(String key) {
+        key = parseKey(key);
+
         if(!translations.containsKey(key))
             return key;
         return translations.get(key);
     }
 
     public MutableText getAsText(String key) {
-        if(!translations.containsKey(key))
-            return Text.literal(key);
-        return Text.literal(translations.get(key));
+        return Text.literal(get(key));
+    }
+
+    private String parseKey(String key) {
+        if(key.contains(":")) {
+            return Identifier.of(key).toTranslationKey();
+        }
+        return key;
     }
 
     public static void clearTranslators() {
