@@ -1,8 +1,10 @@
 package com.vanillapings.features.ping.input;
 
+import com.vanillapings.VanillaPings;
 import com.vanillapings.features.ping.ClientPingManager;
 import com.vanillapings.translation.Translations;
 import com.vanillapings.util.InputCooldown;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
