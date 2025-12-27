@@ -1,8 +1,8 @@
 package com.vanillapings.features.ping;
 
+import com.vanillapings.VanillaPings;
 import com.vanillapings.mixin.ArmorStandEntityAccessor;
 import com.vanillapings.translation.Translations;
-import com.vanillapings.VanillaPings;
 import com.vanillapings.util.InputCooldown;
 import com.vanillapings.util.Triple;
 import net.minecraft.block.BlockState;
@@ -19,7 +19,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;

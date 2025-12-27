@@ -2,8 +2,8 @@ package com.vanillapings.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
-import com.vanillapings.translation.Translations;
 import com.vanillapings.VanillaPings;
+import com.vanillapings.translation.Translations;
 import com.vanillapings.translation.Translator;
 import net.minecraft.server.command.ServerCommandSource;
 
