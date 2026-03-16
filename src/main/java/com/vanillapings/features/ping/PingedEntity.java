@@ -73,7 +73,7 @@ public class PingedEntity {
         }
 
         if(kill)
-            entity.kill();
+            entity.discard();
     }
 
     private boolean shouldInterfereWithGlowing() {
