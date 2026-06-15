@@ -5,7 +5,7 @@
 
 mod.id = "vanillapings"
 mod.name = "Vanilla Pings"
-mod.version = "1.11.0"
+mod.version = "1.11.1"
 mod.group = "com.vanillapings"
 deps.fabric_loader = "0.19.3"
 # loom-back-compat base loom version (it adjusts the variant per Minecraft version).

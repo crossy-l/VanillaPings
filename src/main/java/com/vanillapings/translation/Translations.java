@@ -125,9 +125,9 @@ public class Translations {
           String msg2 = msg.split("%2s")[1];
           msg = msg.split("%2s")[0];
 
-          MutableComponent text = (MutableComponent) Component.of(String.format(msg, extra.first()));
+          MutableComponent text = Component.literal(String.format(msg, extra.first()));
           text.append(extra.second());
-          text.append(Component.of(String.format(msg2,  extra.third().getX(), extra.third().getY(), extra.third().getZ())));
+          text.append(Component.literal(String.format(msg2,  extra.third().getX(), extra.third().getY(), extra.third().getZ())));
           text.withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
 
           return text;
@@ -143,7 +143,7 @@ public class Translations {
                         style = style.withColor(ChatFormatting.YELLOW);
                     else if(extra.first() >= 50)
                         style = style.withColor(ChatFormatting.GREEN);
-                    return ((MutableComponent) Component.of(String.format(msg, extra.second(), extra.first(), extra.third()))).fillStyle(style);
+                    return Component.literal(String.format(msg, extra.second(), extra.first(), extra.third())).withStyle(style);
                 } catch (Exception error) {
                     return Component.literal(KEY_PING_DIRECTION_MESSAGE);
                 }

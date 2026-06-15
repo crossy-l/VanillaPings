@@ -10,8 +10,9 @@ public interface ArmorStandEntityAccessor {
     void invokeSetMarker(boolean marker);
     @Invoker("setSmall")
     void invokeSetSmall(boolean small);
-    // Public on 1.20+, private on 1.19.2 — the invoker works regardless of access level.
-    @Invoker("setHideBasePlate")
+    // Mojmap names it setNoBasePlate (true = no plate); access level varies by version,
+    // but @Invoker works regardless.
+    @Invoker("setNoBasePlate")
     void invokeSetHideBasePlate(boolean hide);
     @Invoker("setShowArms")
     void invokeSetShowArms(boolean show);

@@ -8,6 +8,7 @@ import com.vanillapings.util.Triple;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -61,7 +62,7 @@ public class PingManager {
      * @param customHandle A custom handler which will be called when a ping can be made.
      */
     public static void pingInFrontOfEntity(Player player, @Nullable CustomPingHandle customHandle) {
-        boolean isNotInWater = player.getBlockStateAtPos().getFluidState().isEmpty();
+        boolean isNotInWater = Compat.entityWorld(player).getBlockState(player.blockPosition()).getFluidState().isEmpty();
         @Nullable Entity targetEntity = null;
 
         @Nullable Vec3 pos = fastRaycast(player, isNotInWater, VanillaPings.SETTINGS.getPingRange());
@@ -121,7 +122,7 @@ public class PingManager {
         }
 
         // Send ping message
-        world.getPlayers().forEach(playerEntity -> {
+        world.players().forEach(playerEntity -> {
             Vec3 playerPos = Compat.entityPos(playerEntity);
             int distance = (int)Math.floor(new Vec3(pos.x - playerPos.x, 0, pos.z - playerPos.z).length());
             if(distance < VanillaPings.SETTINGS.getPingDirectionMessageRange() || VanillaPings.SETTINGS.hasInfinitePingDirectionMessageRange()) {
@@ -204,12 +205,12 @@ public class PingManager {
 
     public static Component getTextForEntity(Entity entity) {
         if(entity instanceof ItemEntity itemEntity) {
-            MutableComponent completeText = (MutableComponent) itemEntity.getStack().toHoverableText();
+            MutableComponent completeText = (MutableComponent) itemEntity.getItem().getDisplayName();
 
             if(VanillaPings.SETTINGS.isPingItemCount() && VanillaPings.SETTINGS.getPingItemCountRange() != 0) {
-                int amount = countStackableItemsInRange(Compat.entityWorld(itemEntity), Compat.entityPos(itemEntity), VanillaPings.SETTINGS.getPingItemCountRange(), itemEntity.getStack());
+                int amount = countStackableItemsInRange(Compat.entityWorld(itemEntity), Compat.entityPos(itemEntity), VanillaPings.SETTINGS.getPingItemCountRange(), itemEntity.getItem());
                 if(amount > 1) {
-                    MutableComponent amountText = (MutableComponent) Component.of(String.format(" (%dx)", amount));
+                    MutableComponent amountText = Component.literal(String.format(" (%dx)", amount));
                     completeText.append(amountText);
                 }
             }
@@ -242,7 +243,7 @@ public class PingManager {
             if(perc < 0.2)
                 healthStyle = completeText.getStyle().withColor(ChatFormatting.DARK_RED);
 
-            MutableComponent healthText = (MutableComponent) Component.of(String.format(" (%d❤)", health));
+            MutableComponent healthText = Component.literal(String.format(" (%d❤)", health));
             healthText.setStyle(healthStyle);
             completeText.append(healthText);
         }
@@ -263,16 +264,16 @@ public class PingManager {
         int totalCount = 0;
 
         AABB boundingBox = new AABB(
-            center.getX() - range, center.getY() - range, center.getZ() - range,
-            center.getX() + range, center.getY() + range, center.getZ() + range
+            center.x() - range, center.y() - range, center.z() - range,
+            center.x() + range, center.y() + range, center.z() + range
         );
 
         for (Entity entity : world.getEntitiesOfClass(Entity.class, boundingBox, entity -> entity instanceof ItemEntity)) {
             ItemEntity itemEntity = (ItemEntity) entity;
 
-            ItemStack itemStack = itemEntity.getStack();
+            ItemStack itemStack = itemEntity.getItem();
             // Make sure the item is of the same type has the same name and enchantments
-            if (itemStack.getItem() == targetItem.getItem() && itemStack.getName().equals(targetItem.getName()) && itemStack.getEnchantments().equals(targetItem.getEnchantments())) {
+            if (itemStack.getItem() == targetItem.getItem() && itemStack.getHoverName().equals(targetItem.getHoverName()) && Compat.enchantmentsMatch(itemStack, targetItem)) {
                 totalCount += itemStack.getCount();
             }
         }
@@ -310,7 +311,7 @@ public class PingManager {
         double yChange;
 
         while (distance < maxDistance) {
-            yChange = y - prevPos.getY();
+            yChange = y - prevPos.y();
             BlockPos currentPos = new BlockPos((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z));
             Vec3 distancePos = new Vec3(x, startPos.y, z);
             double distanceToStart = startPos.distanceTo(distancePos);
@@ -320,7 +321,7 @@ public class PingManager {
 
             BlockState state = world.getBlockState(currentPos);
             if (!state.isAir()) {
-                Vec3 returnPos = new Vec3(x, world.getBlockState(currentPos.add(0, 1, 0)).isAir() ? y + 0.25 : y, z);
+                Vec3 returnPos = new Vec3(x, world.getBlockState(currentPos.offset(0, 1, 0)).isAir() ? y + 0.25 : y, z);
                 if(!includeFluids) {
                     if(state.getFluidState().isEmpty())
                         return returnPos;
@@ -351,15 +352,15 @@ public class PingManager {
 
         Vec3 playerPos = sourceEntity.getEyePosition(1.0F);
         Vec3 raycastDir = sourceEntity.getViewVector(1.0F);
-        Vec3 raycastEnd = playerPos.add(raycastDir.multiply(maxDistance));
+        Vec3 raycastEnd = playerPos.add(raycastDir.scale(maxDistance));
 
-        BlockHitResult blockHitResult = world.raycast(new ClipContext(playerPos, raycastEnd,
-                ClipContext.ShapeType.OUTLINE, includeFluids ? ClipContext.FluidHandling.ANY : ClipContext.FluidHandling.NONE, sourceEntity));
+        BlockHitResult blockHitResult = world.clip(new ClipContext(playerPos, raycastEnd,
+                ClipContext.Block.OUTLINE, includeFluids ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE, sourceEntity));
 
         if (blockHitResult.getType() == HitResult.Type.MISS)
             return null;
 
-        return blockHitResult.getPos();
+        return blockHitResult.getLocation();
     }
 
     /**
@@ -370,16 +371,16 @@ public class PingManager {
      */
     public static @Nullable RayResult fastEntityRaycast(Entity sourceEntity, double maxDistance) {
         Vec3 start = sourceEntity.getEyePosition(1.0F);
-        Vec3 end = start.add(sourceEntity.getViewVector(1.0F).multiply(maxDistance));
-        AABB searchBox = sourceEntity.getBoundingBox().expandTowards(end.subtract(start)).expand(1.0D);
+        Vec3 end = start.add(sourceEntity.getViewVector(1.0F).scale(maxDistance));
+        AABB searchBox = sourceEntity.getBoundingBox().expandTowards(end.subtract(start)).inflate(1.0D);
 
         double closestDistance = Double.POSITIVE_INFINITY;
         @Nullable Vec3 pos = null;
         @Nullable Entity hitEntity = null;
 
         for (Entity entity : Compat.entityWorld(sourceEntity).getEntities(sourceEntity, searchBox)) {
-            AABB entityBox = entity.getBoundingBox().expand(entity.getTargetingMargin());
-            Optional<Vec3> hitResult = entityBox.raycast(start, end);
+            AABB entityBox = entity.getBoundingBox().inflate(entity.getPickRadius());
+            Optional<Vec3> hitResult = entityBox.clip(start, end);
 
             if (entityBox.contains(start)) {
                 if (closestDistance >= 0.0D) {
@@ -411,9 +412,9 @@ public class PingManager {
      */
     public static int removeOldPings(MinecraftServer server) {
         int removed = 0;
-        for (ServerLevel world : server.getWorlds()) {
+        for (ServerLevel world : server.getAllLevels()) {
             List<Entity> remove = new ArrayList<>();
-            world.iterateEntities().forEach(entity -> {
+            world.getAllEntities().forEach(entity -> {
                 if(entity != null && entity.getCustomName() != null && entity.getCustomName().equals(noPingText) && entities.stream().noneMatch(pingedEntity -> pingedEntity.getEntity().equals(entity)))
                     remove.add(entity);
             });

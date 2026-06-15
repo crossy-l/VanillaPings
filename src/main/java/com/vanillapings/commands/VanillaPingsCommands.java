@@ -46,17 +46,21 @@ public class VanillaPingsCommands {
                                 .then(argument("value", BoolArgumentType.bool())
                                         .executes(ctx -> SoundCommand.setSound(ctx, BoolArgumentType.getBool(ctx, "value")))))
                         .then(literal("glowing")
-                                .executes(ctx -> GlowingCommand.setGlowingTag(ctx, !VanillaPings.SETTINGS.isPingGlowing()))
+                                .executes(ctx -> GlowingCommand.setGlowing(ctx, !VanillaPings.SETTINGS.isPingGlowing()))
                                 .then(argument("value", BoolArgumentType.bool())
-                                        .executes(ctx -> GlowingCommand.setGlowingTag(ctx, BoolArgumentType.getBool(ctx, "value"))))
+                                        .executes(ctx -> GlowingCommand.setGlowing(ctx, BoolArgumentType.getBool(ctx, "value"))))
                                 .then(literal("flash")
                                         .executes(ctx -> GlowingCommand.setGlowingFlash(ctx, !VanillaPings.SETTINGS.isPingGlowingFlash()))
                                         .then(argument("value", BoolArgumentType.bool())
                                                 .executes(ctx -> GlowingCommand.setGlowingFlash(ctx, BoolArgumentType.getBool(ctx, "value")))))
                         )
                         .then(literal("item")
-                                .then(argument("item", ItemArgument.itemStack(registryAccess))
-                                        .executes(ctx -> ItemCommand.setItem(ctx, ItemArgument.getItemStackArgument(ctx, "item").getItem())))
+                                .then(argument("item", ItemArgument.item(registryAccess))
+                                        //? if >=26.1 {
+                                        /*.executes(ctx -> ItemCommand.setItem(ctx, ItemArgument.getItem(ctx, "item").item().value())))
+                                        *///?} else {
+                                        .executes(ctx -> ItemCommand.setItem(ctx, ItemArgument.getItem(ctx, "item").getItem())))
+                                        //?}
                                 .then(literal("count")
                                         .executes(ctx -> ItemCommand.setItemCount(ctx, !VanillaPings.SETTINGS.isPingItemCount()))
                                         .then(argument("value", BoolArgumentType.bool())
@@ -93,21 +97,21 @@ public class VanillaPingsCommands {
     public static void broadcastCommandUsageToOperators(Component message, CommandSourceStack source) {
         MinecraftServer server = source.getServer();
 
-        if(!(source.getEntity() instanceof LivingEntity) && !source.getName().equals("Server") && !Compat.commandBlockOutput(source))
+        if(!(source.getEntity() instanceof LivingEntity) && !source.getTextName().equals("Server") && !Compat.commandBlockOutput(source))
             return;
 
 
-        List<ServerPlayer> operators = server.getPlayerList().getPlayerList().stream().filter(player -> Compat.isAdmin(player, server)).toList();
+        List<ServerPlayer> operators = server.getPlayerList().getPlayers().stream().filter(player -> Compat.isAdmin(player, server)).toList();
 
-        Component mMessage = Component.literal(String.format("[%s: ", source.getName())).append(message).append(Component.literal("]")).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC);
+        Component mMessage = Component.literal(String.format("[%s: ", source.getTextName())).append(message).append(Component.literal("]")).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC);
         UUID sourceId = source.getEntity() != null ? source.getEntity().getUUID() : null;
         if(Compat.sendCommandFeedback(source))
             operators.forEach(player -> {
                 if(!player.getUUID().equals(sourceId))
-                    player.sendMessage(mMessage);
+                    Compat.sendChatMessage(player, mMessage);
             });
-        if(Compat.logAdminCommands(source) && !source.getName().equals("Server"))
-            server.sendMessage(mMessage);
+        if(Compat.logAdminCommands(source) && !source.getTextName().equals("Server"))
+            server.sendSystemMessage(mMessage);
     }
 
     public static void sendCommandFeedBack(Component message, CommandSourceStack source) {
@@ -116,12 +120,12 @@ public class VanillaPingsCommands {
 
     public static void sendCommandFeedBack(Component message, Component operatorText, CommandSourceStack source) {
         if(isCommandFeedbackAllowed(source))
-            source.sendMessage(message);
+            source.sendSystemMessage(message);
         broadcastCommandUsageToOperators(operatorText, source);
     }
 
     public static boolean isCommandFeedbackAllowed(CommandSourceStack source) {
-        boolean isServer = !(source.getEntity() instanceof LivingEntity) && source.getName().equals("Server");
+        boolean isServer = !(source.getEntity() instanceof LivingEntity) && source.getTextName().equals("Server");
         return Compat.sendCommandFeedback(source) || isServer;
     }
 }

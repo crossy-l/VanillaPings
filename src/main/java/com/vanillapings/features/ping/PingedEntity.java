@@ -80,7 +80,7 @@ public class PingedEntity {
     private boolean shouldInterfereWithGlowing() {
         if(highlightSettings.isHighlight()) {
             if(entity instanceof LivingEntity livingEntity) {
-                return !livingEntity.getActiveEffects().stream().anyMatch(statusEffectInstance -> statusEffectInstance.getEffectType().equals(MobEffects.GLOWING));
+                return !livingEntity.getActiveEffects().stream().anyMatch(statusEffectInstance -> statusEffectInstance.getEffect().equals(MobEffects.GLOWING));
             }
             return true;
         }
@@ -90,14 +90,14 @@ public class PingedEntity {
     private void audibilize() {
 
         if(soundAge == 0)
-            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL), SoundSource.PLAYERS, 10f, 1);
+            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), Compat.sound(SoundEvents.NOTE_BLOCK_COW_BELL), SoundSource.PLAYERS, 10f, 1);
         if(soundAge == 5)
-            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_BELL), SoundSource.PLAYERS, 10f, 1);
+            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), Compat.sound(SoundEvents.NOTE_BLOCK_BELL), SoundSource.PLAYERS, 10f, 1);
         if(soundAge == 7)
-            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME), SoundSource.PLAYERS, 10f, 1.5f);
+            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), Compat.sound(SoundEvents.NOTE_BLOCK_CHIME), SoundSource.PLAYERS, 10f, 1.5f);
 
         if(age >= maxAge) {
-            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), SoundEvents.BLOCK_AMETHYST_BLOCK_FALL, SoundSource.PLAYERS, 10f, 1.25f);
+            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), SoundEvents.AMETHYST_BLOCK_FALL, SoundSource.PLAYERS, 10f, 1.25f);
         }
 
         soundAge++;

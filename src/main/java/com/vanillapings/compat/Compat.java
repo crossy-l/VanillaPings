@@ -4,7 +4,11 @@ import com.vanillapings.mixin.ArmorStandEntityAccessor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+//? if >=1.21.3 {
 import net.minecraft.world.entity.EntitySpawnReason;
+//?} elif >=1.20.5 {
+/*import net.minecraft.world.entity.MobSpawnType;*/
+//?}
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -21,14 +25,17 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+//? if >=1.21.11 {
+import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?}
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 //? if >=1.21.11 {
-import net.minecraft.commands.Permission;
-import net.minecraft.commands.PermissionLevel;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.server.permissions.Permissions;
+import net.minecraft.world.level.gamerules.GameRules;
 //?} else {
 /*import net.minecraft.world.level.GameRules;*/
 //?}
@@ -46,39 +53,47 @@ public final class Compat {
     private Compat() {
     }
 
-    /** {@code ResourceLocation.of(ns, path)} on 1.21+, {@code new ResourceLocation(ns, path)} on older versions. */
-    public static ResourceLocation id(String namespace, String path) {
-        //? if >=1.21 {
-        return ResourceLocation.of(namespace, path);
+    // The id class was renamed ResourceLocation -> Identifier at 1.21.11, and its public
+    // constructor was replaced by static factories (fromNamespaceAndPath / parse) at 1.21.
+    //? if >=1.21.11 {
+    public static Identifier id(String namespace, String path) {
+    //?} else {
+    /*public static ResourceLocation id(String namespace, String path) {*/
+    //?}
+        //? if >=1.21.11 {
+        return Identifier.fromNamespaceAndPath(namespace, path);
+        //?} elif >=1.21 {
+        /*return ResourceLocation.fromNamespaceAndPath(namespace, path);*/
         //?} else {
         /*return new ResourceLocation(namespace, path);*/
         //?}
     }
 
-    /** {@code ResourceLocation.of("ns:path")} on 1.21+, {@code new ResourceLocation("ns:path")} on older versions. */
-    public static ResourceLocation id(String id) {
-        //? if >=1.21 {
-        return ResourceLocation.of(id);
+    //? if >=1.21.11 {
+    public static Identifier id(String id) {
+    //?} else {
+    /*public static ResourceLocation id(String id) {*/
+    //?}
+        //? if >=1.21.11 {
+        return Identifier.parse(id);
+        //?} elif >=1.21 {
+        /*return ResourceLocation.parse(id);*/
         //?} else {
         /*return new ResourceLocation(id);*/
         //?}
     }
 
-    /** {@code getEntityPos()} on recent versions, {@code getPos()} on older ones. */
+    /** The entity's position. */
     public static Vec3 entityPos(Entity entity) {
-        //? if >=1.21.9 {
         return entity.position();
-        //?} else {
-        /*return entity.getPos();*/
-        //?}
     }
 
-    /** {@code getEntityWorld()} on recent versions, {@code getWorld()} on older ones. */
+    /** The entity's level. The {@code level()} accessor replaced the public {@code level} field at 1.20. */
     public static Level entityWorld(Entity entity) {
-        //? if >=1.21.9 {
+        //? if >=1.20 {
         return entity.level();
         //?} else {
-        /*return entity.getWorld();*/
+        /*return entity.level;*/
         //?}
     }
 
@@ -97,41 +112,68 @@ public final class Compat {
     // 1.19.4+ uses net.minecraft.registry.BuiltInRegistries; 1.19.2 uses net.minecraft.util.registry.Registry.
     // The .ITEM.getId/containsId/get methods are identical across both.
 
-    public static ResourceLocation itemId(Item item) {
+    //? if >=1.21.11 {
+    public static Identifier itemId(Item item) {
+    //?} else {
+    /*public static ResourceLocation itemId(Item item) {*/
+    //?}
         //? if >=1.19.4 {
-        return BuiltInRegistries.ITEM.getId(item);
+        return BuiltInRegistries.ITEM.getKey(item);
         //?} else {
-        /*return Registry.ITEM.getId(item);*/
+        /*return Registry.ITEM.getKey(item);*/
         //?}
     }
 
-    public static boolean itemExists(ResourceLocation id) {
+    //? if >=1.21.11 {
+    public static boolean itemExists(Identifier id) {
+    //?} else {
+    /*public static boolean itemExists(ResourceLocation id) {*/
+    //?}
         //? if >=1.19.4 {
-        return BuiltInRegistries.ITEM.containsId(id);
+        return BuiltInRegistries.ITEM.containsKey(id);
         //?} else {
-        /*return Registry.ITEM.containsId(id);*/
+        /*return Registry.ITEM.containsKey(id);*/
         //?}
     }
 
-    public static Item getItem(ResourceLocation id) {
-        //? if >=1.19.4 {
-        return BuiltInRegistries.ITEM.get(id);
+    //? if >=1.21.11 {
+    public static Item getItem(Identifier id) {
+    //?} else {
+    /*public static Item getItem(ResourceLocation id) {*/
+    //?}
+        //? if >=1.21.3 {
+        return BuiltInRegistries.ITEM.getValue(id);
+        //?} elif >=1.19.4 {
+        /*return BuiltInRegistries.ITEM.get(id);*/
         //?} else {
         /*return Registry.ITEM.get(id);*/
         //?}
     }
 
-    /** Send a message to the player's action-bar overlay. The boolean meaning flipped at 1.21.3. */
-    public static void sendActionBar(Player player, Component text) {
-        player.sendMessage(text, true);
+    /** True if two stacks carry equal enchantments. Storage became the {@code getEnchantments()} component at 1.20.5; older versions expose the raw NBT list. */
+    public static boolean enchantmentsMatch(ItemStack a, ItemStack b) {
+        //? if >=1.20.5 {
+        return a.getEnchantments().equals(b.getEnchantments());
+        //?} else {
+        /*return a.getEnchantmentTags().equals(b.getEnchantmentTags());*/
+        //?}
     }
 
-    /** Send a message to the player's chat. The boolean meaning flipped at 1.21.3. */
+    /** Send a message to the player's action-bar overlay. {@code displayClientMessage(text, true)} split into {@code sendOverlayMessage} at 26.1. */
+    public static void sendActionBar(Player player, Component text) {
+        //? if >=26.1 {
+        /*player.sendOverlayMessage(text);
+        *///?} else {
+        player.displayClientMessage(text, true);
+        //?}
+    }
+
+    /** Send a message to the player's chat. {@code displayClientMessage(text, false)} became {@code sendSystemMessage} at 26.1. */
     public static void sendChatMessage(Player player, Component text) {
-        //? if >=1.21.3 {
-        player.sendMessage(text, false);
-        //?} else {
-        /*player.sendMessage(text);*/
+        //? if >=26.1 {
+        /*player.sendSystemMessage(text);
+        *///?} else {
+        player.displayClientMessage(text, false);
         //?}
     }
 
@@ -161,7 +203,11 @@ public final class Compat {
                 (ServerLevel) world,
                 armorStand -> configurePingArmorStand(armorStand, customName, headItem, pos),
                 BlockPos.containing(pos),
+                //? if >=1.21.3 {
                 EntitySpawnReason.COMMAND,
+                //?} else {
+                /*MobSpawnType.COMMAND,*/
+                //?}
                 false,  // alignPosition
                 false   // invertY
         );
@@ -169,7 +215,7 @@ public final class Compat {
         /*ArmorStand armorStand = EntityType.ARMOR_STAND.create(world);
         if (armorStand == null) return null;
         configurePingArmorStand(armorStand, customName, headItem, pos);
-        world.spawnEntity(armorStand);
+        ((ServerLevel) world).addFreshEntity(armorStand);
         return armorStand;*/
         //?}
     }
@@ -185,52 +231,55 @@ public final class Compat {
         accessor.invokeSetShowArms(false);
         armorStand.setCustomName(customName);
         armorStand.setItemSlot(EquipmentSlot.HEAD, headItem);
-        armorStand.setPos(pos.getX(), pos.getY() - 0.8, pos.getZ());
+        armorStand.setPos(pos.x(), pos.y() - 0.8, pos.z());
     }
 
     // ---- Permissions & game rules ----
-    // The permission API (Permission/PermissionLevel + getPermissions()) and the GameRules
-    // package/accessors (getValue vs getBoolean, .world.rule vs .world) changed at 1.21.11.
+    // At 1.21.11 the permission API became permissions().hasPermission(Permission) and the
+    // GameRules class moved to ...gamerules with get(GameRule) replacing getBoolean(Key); the
+    // rule constants were also renamed (RULE_COMMANDBLOCKOUTPUT -> COMMAND_BLOCK_OUTPUT, etc.).
 
     /** True if the command source has admin-level permission. */
     public static boolean isAdmin(CommandSourceStack source) {
         //? if >=1.21.11 {
-        return source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.ADMINS));
+        return source.permissions().hasPermission(Permissions.COMMANDS_ADMIN);
         //?} else {
-        /*return source.hasPermissionLevel(4);*/
+        /*return source.hasPermission(4);*/
         //?}
     }
 
     /** True if the player has admin-level (operator) permission. */
     public static boolean isAdmin(ServerPlayer player, MinecraftServer server) {
         //? if >=1.21.11 {
-        return player.getPermissions().hasPermission(new Permission.Level(PermissionLevel.ADMINS));
+        return player.permissions().hasPermission(Permissions.COMMANDS_ADMIN);
+        //?} elif >=1.21.9 {
+        /*return player.hasPermissions(server.operatorUserPermissionLevel());*/
         //?} else {
-        /*return player.hasPermissionLevel(server.getOpPermissionLevel());*/
+        /*return player.hasPermissions(server.getOperatorUserPermissionLevel());*/
         //?}
     }
 
     public static boolean commandBlockOutput(CommandSourceStack source) {
         //? if >=1.21.11 {
-        return source.getWorld().getGameRules().getValue(GameRules.COMMAND_BLOCK_OUTPUT);
+        return source.getLevel().getGameRules().get(GameRules.COMMAND_BLOCK_OUTPUT);
         //?} else {
-        /*return source.getServer().getGameRules().getBoolean(GameRules.COMMAND_BLOCK_OUTPUT);*/
+        /*return source.getLevel().getGameRules().getBoolean(GameRules.RULE_COMMANDBLOCKOUTPUT);*/
         //?}
     }
 
     public static boolean sendCommandFeedback(CommandSourceStack source) {
         //? if >=1.21.11 {
-        return source.getWorld().getGameRules().getValue(GameRules.SEND_COMMAND_FEEDBACK);
+        return source.getLevel().getGameRules().get(GameRules.SEND_COMMAND_FEEDBACK);
         //?} else {
-        /*return source.getServer().getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK);*/
+        /*return source.getLevel().getGameRules().getBoolean(GameRules.RULE_SENDCOMMANDFEEDBACK);*/
         //?}
     }
 
     public static boolean logAdminCommands(CommandSourceStack source) {
         //? if >=1.21.11 {
-        return source.getWorld().getGameRules().getValue(GameRules.LOG_ADMIN_COMMANDS);
+        return source.getLevel().getGameRules().get(GameRules.LOG_ADMIN_COMMANDS);
         //?} else {
-        /*return source.getServer().getGameRules().getBoolean(GameRules.LOG_ADMIN_COMMANDS);*/
+        /*return source.getLevel().getGameRules().getBoolean(GameRules.RULE_LOGADMINCOMMANDS);*/
         //?}
     }
 }

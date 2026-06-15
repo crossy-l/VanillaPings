@@ -9,7 +9,6 @@ import com.vanillapings.compat.Compat;
 import com.vanillapings.config.FileConfig;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,7 +100,8 @@ public class Translator {
 
     private String parseKey(String key) {
         if(key.contains(":")) {
-            return Compat.id(key).toTranslationKey();
+            var id = Compat.id(key);
+            return id.getNamespace() + "." + id.getPath();
         }
         return key;
     }

@@ -8,7 +8,7 @@ import net.minecraft.commands.CommandSourceStack;
 
 public class GlowingCommand {
     public static int setGlowing(CommandContext<CommandSourceStack> ctx, boolean value) {
-        VanillaPingsCommands.sendCommandFeedBack(Translations.GLOWING_ENABLED.constructMessage(value, VanillaPings.SETTINGS.setGlowingTag(value)), ctx.getSource());
+        VanillaPingsCommands.sendCommandFeedBack(Translations.GLOWING_ENABLED.constructMessage(value, VanillaPings.SETTINGS.setGlowing(value)), ctx.getSource());
         return Command.SINGLE_SUCCESS;
     }
 
