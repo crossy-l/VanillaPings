@@ -1,6 +1,6 @@
 package com.vanillapings.translation;
 
-import net.minecraft.text.MutableText;
+import net.minecraft.network.chat.MutableComponent;
 
 public class Translatable {
     @FunctionalInterface
@@ -10,7 +10,7 @@ public class Translatable {
 
     @FunctionalInterface
     public interface TranslatableSupplier {
-        MutableText get(Translator translator);
+        MutableComponent get(Translator translator);
     }
 
 
@@ -20,11 +20,11 @@ public class Translatable {
         this.supplier = supplier;
     }
 
-    public MutableText constructMessage(Translator translator) {
+    public MutableComponent constructMessage(Translator translator) {
         return supplier.get(translator);
     }
 
-    public MutableText constructMessage() {
+    public MutableComponent constructMessage() {
         return constructMessage(Translator.getTranslator());
     }
 }

@@ -1,14 +1,14 @@
 package com.vanillapings.features.ping;
 
 import com.vanillapings.compat.Compat;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 
 public class PingedEntity {
     private boolean dead = false;
@@ -64,13 +64,13 @@ public class PingedEntity {
 
     private void start() {
         if(highlightSettings.isHighlight() && shouldInterfereWithGlowing()) {
-            entity.setGlowing(true);
+            entity.setGlowingTag(true);
         }
     }
 
     private void end() {
         if(shouldInterfereWithGlowing() && highlightSettings.isHighlight()) {
-            entity.setGlowing(false);
+            entity.setGlowingTag(false);
         }
 
         if(kill)
@@ -80,7 +80,7 @@ public class PingedEntity {
     private boolean shouldInterfereWithGlowing() {
         if(highlightSettings.isHighlight()) {
             if(entity instanceof LivingEntity livingEntity) {
-                return !livingEntity.getStatusEffects().stream().anyMatch(statusEffectInstance -> statusEffectInstance.getEffectType().equals(StatusEffects.GLOWING));
+                return !livingEntity.getActiveEffects().stream().anyMatch(statusEffectInstance -> statusEffectInstance.getEffectType().equals(MobEffects.GLOWING));
             }
             return true;
         }
@@ -90,14 +90,14 @@ public class PingedEntity {
     private void audibilize() {
 
         if(soundAge == 0)
-            Compat.entityWorld(entity).playSound(null, entity.getBlockPos(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL), SoundCategory.PLAYERS, 10f, 1);
+            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL), SoundSource.PLAYERS, 10f, 1);
         if(soundAge == 5)
-            Compat.entityWorld(entity).playSound(null, entity.getBlockPos(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_BELL), SoundCategory.PLAYERS, 10f, 1);
+            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_BELL), SoundSource.PLAYERS, 10f, 1);
         if(soundAge == 7)
-            Compat.entityWorld(entity).playSound(null, entity.getBlockPos(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME), SoundCategory.PLAYERS, 10f, 1.5f);
+            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME), SoundSource.PLAYERS, 10f, 1.5f);
 
         if(age >= maxAge) {
-            Compat.entityWorld(entity).playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 10f, 1.25f);
+            Compat.entityWorld(entity).playSound(null, entity.blockPosition(), SoundEvents.BLOCK_AMETHYST_BLOCK_FALL, SoundSource.PLAYERS, 10f, 1.25f);
         }
 
         soundAge++;
@@ -105,7 +105,7 @@ public class PingedEntity {
 
     private void animate() {
         // Particles and floating up and down
-        double y = startY + MathHelper.sin((float)(age * frequency)) * amplitude + amplitude;
+        double y = startY + Mth.sin((float)(age * frequency)) * amplitude + amplitude;
 
         if(maxAge - age < 20) {
             y += takeOffY;
@@ -114,12 +114,12 @@ public class PingedEntity {
         entity.setPos(entity.getX(), y, entity.getZ());
 
         float rotation = age * rotationSpeed;
-        rotation = MathHelper.wrapDegrees(rotation);
-        entity.setYaw(rotation);
+        rotation = Mth.wrapDegrees(rotation);
+        entity.setYRot(rotation);
 
         if(age >= maxAge) {
-            ((ServerWorld)Compat.entityWorld(entity)).spawnParticles(ParticleTypes.FIREWORK, entity.getX(), entity.getY() + 1.2, entity.getZ(), 10, 0, 0, 0, 0d);
-            ((ServerWorld)Compat.entityWorld(entity)).spawnParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY() + 1.10, entity.getZ(), 10, 0, 0, 0, 0d);
+            ((ServerLevel)Compat.entityWorld(entity)).sendParticles(ParticleTypes.FIREWORK, entity.getX(), entity.getY() + 1.2, entity.getZ(), 10, 0, 0, 0, 0d);
+            ((ServerLevel)Compat.entityWorld(entity)).sendParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY() + 1.10, entity.getZ(), 10, 0, 0, 0, 0d);
         }
     }
 

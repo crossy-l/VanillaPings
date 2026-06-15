@@ -1,12 +1,12 @@
 package com.vanillapings.translation;
 
-import net.minecraft.text.MutableText;
+import net.minecraft.network.chat.MutableComponent;
 
 
 public class TranslatableSingle<U> extends Translatable {
     @FunctionalInterface
     public interface TranslatableSupplierSingle<U> {
-        MutableText get(Translator translator, U extra);
+        MutableComponent get(Translator translator, U extra);
     }
 
     private final TranslatableSupplierSingle<U> singleSupplier;
@@ -31,19 +31,19 @@ public class TranslatableSingle<U> extends Translatable {
         return new TranslatableSingle<U>(this, extraSupplier);
     }
 
-    public MutableText constructMessage(Translator translator, U extra) {
+    public MutableComponent constructMessage(Translator translator, U extra) {
         return singleSupplier.get(translator, extra);
     }
 
-    public MutableText constructMessage(U extra) {
+    public MutableComponent constructMessage(U extra) {
         return constructMessage(Translator.getTranslator(), extra);
     }
 
-    public MutableText constructMessage(Translator translator) {
+    public MutableComponent constructMessage(Translator translator) {
         return constructMessage(translator, extraSupplier.get());
     }
 
-    public MutableText constructMessage() {
+    public MutableComponent constructMessage() {
         return constructMessage(extraSupplier.get());
     }
 }

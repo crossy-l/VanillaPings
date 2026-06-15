@@ -4,12 +4,12 @@ import com.vanillapings.VanillaPings;
 import com.vanillapings.compat.Compat;
 import com.vanillapings.features.ping.PingManager;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 //? if >=1.20.5 {
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 //?}
 
 /**
@@ -17,9 +17,9 @@ import net.minecraft.network.packet.CustomPayload;
  *
  * <p>Three networking eras, all behind {@code //?}:
  * <ul>
- *   <li>{@code >=1.21}: CustomPayload + {@code context.server()}</li>
- *   <li>{@code 1.20.5-1.20.6}: CustomPayload + {@code context.player().getServer()}</li>
- *   <li>{@code <1.20.5}: legacy {@code PacketByteBuf} channel registration (no CustomPayload)</li>
+ *   <li>{@code >=1.21}: CustomPacketPayload + {@code context.server()}</li>
+ *   <li>{@code 1.20.5-1.20.6}: CustomPacketPayload + {@code context.player().getServer()}</li>
+ *   <li>{@code <1.20.5}: legacy {@code RegistryFriendlyByteBuf} channel registration (no CustomPacketPayload)</li>
  * </ul>
  * The payload carries an (unused) {@link BlockPos}; the packet is just a "trigger a ping"
  * signal — the server raycasts from the sending player.
@@ -29,14 +29,14 @@ public final class PingNetworking {
     }
 
     //? if >=1.20.5 {
-    public record PingPayload(BlockPos blockPos) implements CustomPayload {
-        public static final CustomPayload.Id<PingPayload> ID =
-                new CustomPayload.Id<>(Compat.id(VanillaPings.MOD_ID, "ping"));
-        public static final PacketCodec<PacketByteBuf, PingPayload> CODEC =
-                PacketCodec.tuple(BlockPos.PACKET_CODEC, PingPayload::blockPos, PingPayload::new);
+    public record PingPayload(BlockPos blockPos) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Id<PingPayload> ID =
+                new CustomPacketPayload.Id<>(Compat.id(VanillaPings.MOD_ID, "ping"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, PingPayload> CODEC =
+                StreamCodec.tuple(BlockPos.PACKET_CODEC, PingPayload::blockPos, PingPayload::new);
 
         @Override
-        public CustomPayload.Id<? extends CustomPayload> getId() {
+        public CustomPacketPayload.Id<? extends CustomPacketPayload> getId() {
             return ID;
         }
     }
@@ -52,7 +52,7 @@ public final class PingNetworking {
         //?}
     }
     //?} else {
-    /*public static final net.minecraft.util.Identifier ID_PING = Compat.id(VanillaPings.MOD_ID, "ping");
+    /*public static final net.minecraft.util.ResourceLocation ID_PING = Compat.id(VanillaPings.MOD_ID, "ping");
 
     public static void register() {
         ServerPlayNetworking.registerGlobalReceiver(ID_PING,

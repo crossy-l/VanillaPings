@@ -2,9 +2,9 @@ package com.vanillapings.config;
 
 import com.vanillapings.compat.Compat;
 import com.vanillapings.translation.Translator;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +91,7 @@ public class PingSettings extends Settings {
         }
         if(cfg.containsKey(KEY_PING_ITEM)) {
             String itemIdentifier = Objects.requireNonNull(cfg.getString(KEY_PING_ITEM));
-            Identifier pingItemIdentifier = Compat.id(itemIdentifier);
+            ResourceLocation pingItemIdentifier = Compat.id(itemIdentifier);
             if(!Compat.itemExists(pingItemIdentifier))
                 pingItem = Items.BLUE_STAINED_GLASS;
             else

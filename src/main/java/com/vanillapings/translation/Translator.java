@@ -7,9 +7,9 @@ import com.google.gson.stream.JsonReader;
 import com.vanillapings.VanillaPings;
 import com.vanillapings.compat.Compat;
 import com.vanillapings.config.FileConfig;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,8 +95,8 @@ public class Translator {
         return translations.get(key);
     }
 
-    public MutableText getAsText(String key) {
-        return Text.literal(get(key));
+    public MutableComponent getAsText(String key) {
+        return Component.literal(get(key));
     }
 
     private String parseKey(String key) {

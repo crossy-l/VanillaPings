@@ -1,89 +1,70 @@
 plugins {
-    id("net.fabricmc.fabric-loom-remap") version "1.14-SNAPSHOT"
+    // Selects the correct fabric-loom variant for the active Minecraft version.
+    id("dev.kikugie.loom-back-compat")
 }
 
-/**
- * Per-version coordinates, keyed by the Stonecutter node version (the subproject name).
- * `range` is the release label used in the jar name (the version range the jar covers);
- * `mcCompat` is the inclusive Minecraft range the jar declares in fabric.mod.json.
- */
-data class VersionDeps(
-    val range: String,
-    val yarn: String,
-    val loader: String,
-    val fabricApi: String,
-    val mcCompat: String,
-)
-
-val perVersion = mapOf(
-    "1.19.2"  to VersionDeps("1.19.2",        "1.19.2+build.28", "0.15.11", "0.77.0+1.19.2",  "~1.19.2"),
-    "1.19.4"  to VersionDeps("1.19.4",        "1.19.4+build.2",  "0.15.11", "0.87.2+1.19.4",  "~1.19.4"),
-    "1.20.4"  to VersionDeps("1.20-1.20.4",   "1.20.4+build.3",  "0.15.3",  "0.93.1+1.20.4",  ">=1.20 <=1.20.4"),
-    "1.20.6"  to VersionDeps("1.20.5-1.20.6", "1.20.6+build.1",  "0.15.11", "0.97.8+1.20.6",  ">=1.20.5 <=1.20.6"),
-    "1.21.1"  to VersionDeps("1.21-1.21.1",   "1.21.1+build.3",  "0.16.3",  "0.103.0+1.21.1", ">=1.21 <=1.21.1"),
-    "1.21.3"  to VersionDeps("1.21.2-1.21.3", "1.21.3+build.2",  "0.16.8",  "0.106.1+1.21.3", ">=1.21.2 <=1.21.3"),
-    "1.21.4"  to VersionDeps("1.21.4",        "1.21.4+build.4",  "0.16.9",  "0.114.0+1.21.4", "~1.21.4"),
-    "1.21.5"  to VersionDeps("1.21.5",        "1.21.5+build.1",  "0.16.13", "0.119.9+1.21.5", "~1.21.5"),
-    "1.21.6"  to VersionDeps("1.21.6-1.21.8", "1.21.6+build.1",  "0.16.14", "0.128.0+1.21.6", ">=1.21.6 <=1.21.8"),
-    "1.21.9"  to VersionDeps("1.21.9-1.21.10","1.21.9+build.1",  "0.17.2",  "0.134.0+1.21.9", ">=1.21.9 <=1.21.10"),
-    "1.21.11" to VersionDeps("1.21.11",       "1.21.11+build.3", "0.18.4",  "0.140.2+1.21.11", "~1.21.11"),
-)
-
-// The Stonecutter node's subproject name is its Minecraft version (e.g. ":1.21.11").
-val mcVersion: String = project.name
-val deps: VersionDeps = perVersion[mcVersion]
-    ?: throw GradleException("No dependency coordinates for Minecraft $mcVersion in build.gradle.kts")
-
-// Kept as plain SemVer for fabric.mod.json; the jar file name adds the range + "v" below.
-version = property("mod.version") as String
+val modVersion = property("mod.version") as String
+version = modVersion
 group = property("mod.group") as String
+
+// Per-node values from stonecutter.properties.toml (typed so the generic get<T> resolves).
+val modRange: String = sc.properties["mod.range"]
+val fabricApiVersion: String = sc.properties["deps.fabric_api"]
+val mcCompat: String = sc.properties["mod.mc_compat"]
+
+// Minecraft's Java baseline per version (26.x bumped to 25; 1.20.5+ is 21; 1.18+ is 17).
+val requiredJava: JavaVersion = when {
+    sc.current.parsed >= "26.1"   -> JavaVersion.VERSION_25
+    sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
+    else                          -> JavaVersion.VERSION_17
+}
 
 base {
     // e.g. vanillapings-1.20-1.20.4
-    archivesName.set("${property("mod.id")}-${deps.range}")
+    archivesName.set("${property("mod.id")}-$modRange")
 }
 
 // Final jar name: vanillapings-<range>-v<modVersion>.jar
-val jarVersion = "v${property("mod.version")}"
 tasks.withType<org.gradle.api.tasks.bundling.AbstractArchiveTask>().configureEach {
-    archiveVersion.set(jarVersion)
+    archiveVersion.set("v$modVersion")
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:$mcVersion")
-    mappings("net.fabricmc:yarn:${deps.yarn}:v2")
-    modImplementation("net.fabricmc:fabric-loader:${deps.loader}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
+    minecraft("com.mojang:minecraft:${sc.current.version}")
+    // Official Mojang mappings (Yarn ends at 1.21.11; Mojmap covers every version incl. 26.x).
+    loomx.applyMojangMappings()
+    modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
     withSourcesJar()
+    sourceCompatibility = requiredJava
+    targetCompatibility = requiredJava
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(requiredJava.majorVersion)
+    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(21)
     options.encoding = "UTF-8"
 }
 
 tasks.withType<org.gradle.language.jvm.tasks.ProcessResources>().configureEach {
-    inputs.property("version", project.version)
-    inputs.property("minecraft", deps.mcCompat)
+    val v = project.version.toString()
+    val mc = mcCompat
+    inputs.property("version", v)
+    inputs.property("minecraft", mc)
     filesMatching("fabric.mod.json") {
-        expand(
-            "version" to project.version,
-            "minecraft" to deps.mcCompat
-        )
+        expand("version" to v, "minecraft" to mc)
     }
 }
 
-// Builds this version and copies its remapped jar into the root build/libs folder,
-// so a chiseled run collects every version's jar in one place for release.
+// Build this version and copy its jar into the root build/libs for release collection.
 tasks.register<Copy>("buildAndCollect") {
     group = "build"
     description = "Build this version and copy its jar into the root build/libs."
-    from(tasks.named("remapJar"))
+    from(loomx.modJar.map { it.archiveFile })
     into(rootProject.layout.buildDirectory.dir("libs"))
     dependsOn("build")
 }

@@ -9,20 +9,20 @@ import com.vanillapings.VanillaPings;
 import com.vanillapings.compat.Compat;
 import com.vanillapings.features.ping.PingManager;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.argument.ItemStackArgumentType;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.commands.arguments.item.ItemArgument;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 public class VanillaPingsCommands {
     public static void registerCommands() {
@@ -46,17 +46,17 @@ public class VanillaPingsCommands {
                                 .then(argument("value", BoolArgumentType.bool())
                                         .executes(ctx -> SoundCommand.setSound(ctx, BoolArgumentType.getBool(ctx, "value")))))
                         .then(literal("glowing")
-                                .executes(ctx -> GlowingCommand.setGlowing(ctx, !VanillaPings.SETTINGS.isPingGlowing()))
+                                .executes(ctx -> GlowingCommand.setGlowingTag(ctx, !VanillaPings.SETTINGS.isPingGlowing()))
                                 .then(argument("value", BoolArgumentType.bool())
-                                        .executes(ctx -> GlowingCommand.setGlowing(ctx, BoolArgumentType.getBool(ctx, "value"))))
+                                        .executes(ctx -> GlowingCommand.setGlowingTag(ctx, BoolArgumentType.getBool(ctx, "value"))))
                                 .then(literal("flash")
                                         .executes(ctx -> GlowingCommand.setGlowingFlash(ctx, !VanillaPings.SETTINGS.isPingGlowingFlash()))
                                         .then(argument("value", BoolArgumentType.bool())
                                                 .executes(ctx -> GlowingCommand.setGlowingFlash(ctx, BoolArgumentType.getBool(ctx, "value")))))
                         )
                         .then(literal("item")
-                                .then(argument("item", ItemStackArgumentType.itemStack(registryAccess))
-                                        .executes(ctx -> ItemCommand.setItem(ctx, ItemStackArgumentType.getItemStackArgument(ctx, "item").getItem())))
+                                .then(argument("item", ItemArgument.itemStack(registryAccess))
+                                        .executes(ctx -> ItemCommand.setItem(ctx, ItemArgument.getItemStackArgument(ctx, "item").getItem())))
                                 .then(literal("count")
                                         .executes(ctx -> ItemCommand.setItemCount(ctx, !VanillaPings.SETTINGS.isPingItemCount()))
                                         .then(argument("value", BoolArgumentType.bool())
@@ -84,43 +84,43 @@ public class VanillaPingsCommands {
                 literal("ping")
                         .requires(serverCommandSource -> serverCommandSource.getEntity() != null)
                         .executes(ctx -> {
-                            PingManager.pingWithCooldown((ServerPlayerEntity) Objects.requireNonNull(ctx.getSource().getEntity()));
+                            PingManager.pingWithCooldown((ServerPlayer) Objects.requireNonNull(ctx.getSource().getEntity()));
                             return Command.SINGLE_SUCCESS;
                         })
         ));
     }
 
-    public static void broadcastCommandUsageToOperators(Text message, ServerCommandSource source) {
+    public static void broadcastCommandUsageToOperators(Component message, CommandSourceStack source) {
         MinecraftServer server = source.getServer();
 
         if(!(source.getEntity() instanceof LivingEntity) && !source.getName().equals("Server") && !Compat.commandBlockOutput(source))
             return;
 
 
-        List<ServerPlayerEntity> operators = server.getPlayerManager().getPlayerList().stream().filter(player -> Compat.isAdmin(player, server)).toList();
+        List<ServerPlayer> operators = server.getPlayerList().getPlayerList().stream().filter(player -> Compat.isAdmin(player, server)).toList();
 
-        Text mMessage = Text.literal(String.format("[%s: ", source.getName())).append(message).append(Text.literal("]")).formatted(Formatting.GRAY).formatted(Formatting.ITALIC);
-        UUID sourceId = source.getEntity() != null ? source.getEntity().getUuid() : null;
+        Component mMessage = Component.literal(String.format("[%s: ", source.getName())).append(message).append(Component.literal("]")).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC);
+        UUID sourceId = source.getEntity() != null ? source.getEntity().getUUID() : null;
         if(Compat.sendCommandFeedback(source))
             operators.forEach(player -> {
-                if(!player.getUuid().equals(sourceId))
+                if(!player.getUUID().equals(sourceId))
                     player.sendMessage(mMessage);
             });
         if(Compat.logAdminCommands(source) && !source.getName().equals("Server"))
             server.sendMessage(mMessage);
     }
 
-    public static void sendCommandFeedBack(Text message, ServerCommandSource source) {
+    public static void sendCommandFeedBack(Component message, CommandSourceStack source) {
         sendCommandFeedBack(message, message, source);
     }
 
-    public static void sendCommandFeedBack(Text message, Text operatorText, ServerCommandSource source) {
+    public static void sendCommandFeedBack(Component message, Component operatorText, CommandSourceStack source) {
         if(isCommandFeedbackAllowed(source))
             source.sendMessage(message);
         broadcastCommandUsageToOperators(operatorText, source);
     }
 
-    public static boolean isCommandFeedbackAllowed(ServerCommandSource source) {
+    public static boolean isCommandFeedbackAllowed(CommandSourceStack source) {
         boolean isServer = !(source.getEntity() instanceof LivingEntity) && source.getName().equals("Server");
         return Compat.sendCommandFeedback(source) || isServer;
     }

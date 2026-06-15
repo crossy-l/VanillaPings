@@ -4,7 +4,7 @@ import com.vanillapings.networking.PingNetworking;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 @Environment(EnvType.CLIENT)
 public class ClientPingManager {
