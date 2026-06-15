@@ -13,13 +13,13 @@ loomx.loom_version = "1.16-SNAPSHOT"
 
 ["1.19.2"]
 mod.range = "1.19.2"
-mod.mc_compat = "~1.19.2"
+mod.mc_compat = ">=1.19.2 <=1.19.2"
 mod.mc_releases = ["1.19.2"]
 deps.fabric_api = "0.77.0+1.19.2"
 
 ["1.19.4"]
 mod.range = "1.19.4"
-mod.mc_compat = "~1.19.4"
+mod.mc_compat = ">=1.19.4 <=1.19.4"
 mod.mc_releases = ["1.19.4"]
 deps.fabric_api = "0.87.2+1.19.4"
 
@@ -49,13 +49,13 @@ deps.fabric_api = "0.106.1+1.21.3"
 
 ["1.21.4"]
 mod.range = "1.21.4"
-mod.mc_compat = "~1.21.4"
+mod.mc_compat = ">=1.21.4 <=1.21.4"
 mod.mc_releases = ["1.21.4"]
 deps.fabric_api = "0.114.0+1.21.4"
 
 ["1.21.5"]
 mod.range = "1.21.5"
-mod.mc_compat = "~1.21.5"
+mod.mc_compat = ">=1.21.5 <=1.21.5"
 mod.mc_releases = ["1.21.5"]
 deps.fabric_api = "0.119.9+1.21.5"
 
@@ -73,7 +73,7 @@ deps.fabric_api = "0.134.0+1.21.9"
 
 ["1.21.11"]
 mod.range = "1.21.11"
-mod.mc_compat = "~1.21.11"
+mod.mc_compat = ">=1.21.11 <=1.21.11"
 mod.mc_releases = ["1.21.11"]
 deps.fabric_api = "0.140.2+1.21.11"
 
