@@ -1,5 +1,6 @@
 package com.vanillapings.features.ping;
 
+import com.vanillapings.compat.Compat;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -73,7 +74,7 @@ public class PingedEntity {
         }
 
         if(kill)
-            entity.discard();
+            Compat.discard(entity);
     }
 
     private boolean shouldInterfereWithGlowing() {
@@ -89,14 +90,14 @@ public class PingedEntity {
     private void audibilize() {
 
         if(soundAge == 0)
-            entity.getEntityWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL.value(), SoundCategory.PLAYERS, 10f, 1);
+            Compat.entityWorld(entity).playSound(null, entity.getBlockPos(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL), SoundCategory.PLAYERS, 10f, 1);
         if(soundAge == 5)
-            entity.getEntityWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_BELL.value(), SoundCategory.PLAYERS, 10f, 1);
+            Compat.entityWorld(entity).playSound(null, entity.getBlockPos(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_BELL), SoundCategory.PLAYERS, 10f, 1);
         if(soundAge == 7)
-            entity.getEntityWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 10f, 1.5f);
+            Compat.entityWorld(entity).playSound(null, entity.getBlockPos(), Compat.sound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME), SoundCategory.PLAYERS, 10f, 1.5f);
 
         if(age >= maxAge) {
-            entity.getEntityWorld().playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 10f, 1.25f);
+            Compat.entityWorld(entity).playSound(null, entity.getBlockPos(), SoundEvents.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 10f, 1.25f);
         }
 
         soundAge++;
@@ -117,8 +118,8 @@ public class PingedEntity {
         entity.setYaw(rotation);
 
         if(age >= maxAge) {
-            ((ServerWorld)entity.getEntityWorld()).spawnParticles(ParticleTypes.FIREWORK, entity.getX(), entity.getY() + 1.2, entity.getZ(), 10, 0, 0, 0, 0d);
-            ((ServerWorld)entity.getEntityWorld()).spawnParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY() + 1.10, entity.getZ(), 10, 0, 0, 0, 0d);
+            ((ServerWorld)Compat.entityWorld(entity)).spawnParticles(ParticleTypes.FIREWORK, entity.getX(), entity.getY() + 1.2, entity.getZ(), 10, 0, 0, 0, 0d);
+            ((ServerWorld)Compat.entityWorld(entity)).spawnParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY() + 1.10, entity.getZ(), 10, 0, 0, 0, 0d);
         }
     }
 

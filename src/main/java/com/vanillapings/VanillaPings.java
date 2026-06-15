@@ -3,7 +3,7 @@ package com.vanillapings;
 import com.vanillapings.commands.VanillaPingsCommands;
 import com.vanillapings.config.PingSettings;
 import com.vanillapings.features.ping.PingManager;
-import com.vanillapings.networking.CPingPackets;
+import com.vanillapings.networking.PingNetworking;
 import com.vanillapings.translation.Translator;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -13,27 +13,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class VanillaPings implements ModInitializer {
+	public static final String MOD_ID = "vanillapings";
 	public static final String MOD_NAME = "VanillaPings";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 	public static final PingSettings SETTINGS = new PingSettings();
-	private static VanillaPings instance;
 	private static MinecraftServer server;
 
 	@Override
 	public void onInitialize() {
-		instance = this;
-		ServerLifecycleEvents.SERVER_STARTING.register(server1 -> server = server1);
+		ServerLifecycleEvents.SERVER_STARTING.register(startedServer -> server = startedServer);
 		ServerTickEvents.END_SERVER_TICK.register(PingManager::tick);
-		CPingPackets.registerC2SPackets();
+		PingNetworking.register();
 		VanillaPingsCommands.registerCommands();
 		SETTINGS.init();
 		// Initialize default translator now instead of when it's needed
 		Translator.getTranslator();
-		LOGGER.info(MOD_NAME + " initialized");
-	}
-
-	public static VanillaPings getInstance() {
-		return instance;
+		LOGGER.info("{} initialized", MOD_NAME);
 	}
 
 	public static MinecraftServer getServer() {

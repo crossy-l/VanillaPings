@@ -1,7 +1,7 @@
 package com.vanillapings.features.ping;
 
 import com.vanillapings.VanillaPings;
-import com.vanillapings.mixin.ArmorStandEntityAccessor;
+import com.vanillapings.compat.Compat;
 import com.vanillapings.translation.Translations;
 import com.vanillapings.util.InputCooldown;
 import com.vanillapings.util.Triple;
@@ -65,8 +65,8 @@ public class PingManager {
         @Nullable Entity targetEntity = null;
 
         @Nullable Vec3d pos = fastRaycast(player, isNotInWater, VanillaPings.SETTINGS.getPingRange());
-        if(pos != null && pos.distanceTo(player.getEntityPos()) < 200) {
-            @Nullable Vec3d specificPos = exactRaycast(player, isNotInWater, pos.distanceTo(player.getEntityPos()) + 25);
+        if(pos != null && pos.distanceTo(Compat.entityPos(player)) < 200) {
+            @Nullable Vec3d specificPos = exactRaycast(player, isNotInWater, pos.distanceTo(Compat.entityPos(player)) + 25);
             if(specificPos != null)
                 pos = specificPos;
         }
@@ -77,7 +77,7 @@ public class PingManager {
             targetEntity = result.entity;
             pos = result.position;
         } else if(pos != null && result != null) {
-            if(result.position.distanceTo(player.getEntityPos()) < pos.distanceTo(player.getEntityPos())) {
+            if(result.position.distanceTo(Compat.entityPos(player)) < pos.distanceTo(Compat.entityPos(player))) {
                 pos = result.position;
                 targetEntity = result.entity;
             }
@@ -86,10 +86,10 @@ public class PingManager {
             return;
 
         if(customHandle != null) {
-            customHandle.ping(pos, targetEntity, player, player.getEntityWorld());
+            customHandle.ping(pos, targetEntity, player, Compat.entityWorld(player));
             return;
         }
-        pingAtPosition(pos, targetEntity, player, player.getEntityWorld());
+        pingAtPosition(pos, targetEntity, player, Compat.entityWorld(player));
     }
 
     /**
@@ -110,26 +110,7 @@ public class PingManager {
             kill = false;
             targetEntity = pingEntity;
         } else {
-            ArmorStandEntity entity = EntityType.ARMOR_STAND.spawn(
-                    (ServerWorld) world,
-                    armorStand -> {
-                        var accessor = (ArmorStandEntityAccessor) armorStand;
-                        accessor.invokeSetMarker(true);
-                        accessor.invokeSetSmall(true);
-                        armorStand.setInvisible(true);
-                        armorStand.setNoGravity(true);
-                        armorStand.setInvulnerable(true);
-                        armorStand.setHideBasePlate(true);
-                        armorStand.setShowArms(false);
-                        armorStand.setCustomName(noPingText);
-                        armorStand.equipStack(EquipmentSlot.HEAD, new ItemStack(VanillaPings.SETTINGS.getPingItem()));
-                        armorStand.setPos(pos.getX(), pos.getY() - 0.8, pos.getZ());
-                    },
-                    BlockPos.ofFloored(pos),
-                    SpawnReason.COMMAND,
-                    false,  // alignPosition
-                    false  // invertY
-            );
+            ArmorStandEntity entity = Compat.spawnPingArmorStand(world, pos, noPingText, new ItemStack(VanillaPings.SETTINGS.getPingItem()));
 
             if(entity == null) {
                 VanillaPings.LOGGER.error("Couldn't spawn armor stand for ping. This is not intended behaviour.");
@@ -141,18 +122,18 @@ public class PingManager {
 
         // Send ping message
         world.getPlayers().forEach(playerEntity -> {
-            Vec3d playerPos = playerEntity.getEntityPos();
+            Vec3d playerPos = Compat.entityPos(playerEntity);
             int distance = (int)Math.floor(new Vec3d(pos.x - playerPos.x, 0, pos.z - playerPos.z).length());
             if(distance < VanillaPings.SETTINGS.getPingDirectionMessageRange() || VanillaPings.SETTINGS.hasInfinitePingDirectionMessageRange()) {
-                double degree = getDegreeDirectionToPing(pos, playerEntity.getEntityPos());
+                double degree = getDegreeDirectionToPing(pos, Compat.entityPos(playerEntity));
                 double relDegree = getRelativeDegree(degree, playerEntity.getYaw());
                 var pingDirMessage = Translations.PING_DIRECTION_MESSAGE.constructMessage(new Triple<>(distance, getPingDirectionArrow(relDegree), getPingCardinalDirection(degree)));
-                playerEntity.sendMessage(pingDirMessage, true);
+                Compat.sendActionBar(playerEntity, pingDirMessage);
             }
 
             if(pingEntity != null && (distance < VanillaPings.SETTINGS.getPingChatMessageRange() || VanillaPings.SETTINGS.hasInfinitePingChatMessageRange())) {
                 var pingMessage = Translations.PING_MESSAGE.constructMessage(new Triple<>(player.getName().getString(), getTextForEntity(pingEntity), new Vec3i((int) Math.round(pos.x), (int)Math.round(pos.y), (int)Math.round(pos.z))));
-                playerEntity.sendMessage(pingMessage, false);
+                Compat.sendChatMessage(playerEntity, pingMessage);
             }
         });
 
@@ -226,7 +207,7 @@ public class PingManager {
             MutableText completeText = (MutableText) itemEntity.getStack().toHoverableText();
 
             if(VanillaPings.SETTINGS.isPingItemCount() && VanillaPings.SETTINGS.getPingItemCountRange() != 0) {
-                int amount = countStackableItemsInRange(itemEntity.getEntityWorld(), itemEntity.getEntityPos(), VanillaPings.SETTINGS.getPingItemCountRange(), itemEntity.getStack());
+                int amount = countStackableItemsInRange(Compat.entityWorld(itemEntity), Compat.entityPos(itemEntity), VanillaPings.SETTINGS.getPingItemCountRange(), itemEntity.getStack());
                 if(amount > 1) {
                     MutableText amountText = (MutableText) Text.of(String.format(" (%dx)", amount));
                     completeText.append(amountText);
@@ -322,7 +303,7 @@ public class PingManager {
         double y = startPos.y;
         double z = startPos.z;
 
-        World world = sourceEntity.getEntityWorld();
+        World world = Compat.entityWorld(sourceEntity);
 
         double distance = 0.0;
         Vec3d prevPos = startPos;
@@ -366,7 +347,7 @@ public class PingManager {
      * @return The {@link Vec3d} of the raycast hit or null if nothing is hit.
      */
     public static @Nullable Vec3d exactRaycast(Entity sourceEntity, boolean includeFluids, double maxDistance) {
-        World world = sourceEntity.getEntityWorld();
+        World world = Compat.entityWorld(sourceEntity);
 
         Vec3d playerPos = sourceEntity.getCameraPosVec(1.0F);
         Vec3d raycastDir = sourceEntity.getRotationVec(1.0F);
@@ -396,7 +377,7 @@ public class PingManager {
         @Nullable Vec3d pos = null;
         @Nullable Entity hitEntity = null;
 
-        for (Entity entity : sourceEntity.getEntityWorld().getOtherEntities(sourceEntity, searchBox)) {
+        for (Entity entity : Compat.entityWorld(sourceEntity).getOtherEntities(sourceEntity, searchBox)) {
             Box entityBox = entity.getBoundingBox().expand(entity.getTargetingMargin());
             Optional<Vec3d> hitResult = entityBox.raycast(start, end);
 
@@ -437,7 +418,7 @@ public class PingManager {
                     remove.add(entity);
             });
             removed += remove.size();
-            remove.forEach(e -> e.kill(world));
+            remove.forEach(e -> Compat.kill(e, world));
         }
         return removed;
     }

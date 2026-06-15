@@ -3,13 +3,13 @@ package com.vanillapings.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.vanillapings.VanillaPings;
+import com.vanillapings.compat.Compat;
 import com.vanillapings.translation.Translations;
 import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.command.ServerCommandSource;
 public class ItemCommand {
     public static int setItem(CommandContext<ServerCommandSource> ctx, Item item) {
-        VanillaPingsCommands.sendCommandFeedBack(Translations.ITEM.constructMessage(Registries.ITEM.getId(item).toString(), VanillaPings.SETTINGS.setPingItem(item)), ctx.getSource());
+        VanillaPingsCommands.sendCommandFeedBack(Translations.ITEM.constructMessage(Compat.itemId(item).toString(), VanillaPings.SETTINGS.setPingItem(item)), ctx.getSource());
         return Command.SINGLE_SUCCESS;
     }
 

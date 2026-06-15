@@ -5,6 +5,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.vanillapings.VanillaPings;
+import com.vanillapings.compat.Compat;
 import com.vanillapings.config.FileConfig;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -100,7 +101,7 @@ public class Translator {
 
     private String parseKey(String key) {
         if(key.contains(":")) {
-            return Identifier.of(key).toTranslationKey();
+            return Compat.id(key).toTranslationKey();
         }
         return key;
     }

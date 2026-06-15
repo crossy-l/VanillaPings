@@ -5,6 +5,11 @@ build/
 out/
 classes/
 
+# stonecutter (generated per-version subproject dirs)
+versions/*/build/
+versions/*/.gradle/
+versions/*/src/
+
 # eclipse
 
 *.launch
