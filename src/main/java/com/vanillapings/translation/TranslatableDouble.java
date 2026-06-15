@@ -1,12 +1,12 @@
 package com.vanillapings.translation;
 
-import net.minecraft.text.MutableText;
+import net.minecraft.network.chat.MutableComponent;
 
 
 public class TranslatableDouble<U, D> extends Translatable {
     @FunctionalInterface
     public interface TranslatableSupplierDouble<U, D> {
-        MutableText get(Translator translator, U extra, D extra2);
+        MutableComponent get(Translator translator, U extra, D extra2);
     }
 
     private final TranslatableSupplierDouble<U, D> doubleSupplier;
@@ -33,19 +33,19 @@ public class TranslatableDouble<U, D> extends Translatable {
         return new TranslatableDouble<U, D>(this, extraSupplier, extraSupplier2);
     }
 
-    public MutableText constructMessage(Translator translator, U extra, D extra2) {
+    public MutableComponent constructMessage(Translator translator, U extra, D extra2) {
         return doubleSupplier.get(translator, extra, extra2);
     }
 
-    public MutableText constructMessage(U extra, D extra2) {
+    public MutableComponent constructMessage(U extra, D extra2) {
         return constructMessage(Translator.getTranslator(), extra, extra2);
     }
 
-    public MutableText constructMessage(Translator translator) {
+    public MutableComponent constructMessage(Translator translator) {
         return constructMessage(translator, extraSupplier.get(), extraSupplier2.get());
     }
 
-    public MutableText constructMessage() {
+    public MutableComponent constructMessage() {
         return constructMessage(extraSupplier.get(), extraSupplier2.get());
     }
 }

@@ -1,6 +1,6 @@
 package com.vanillapings.features.ping;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 public class HighlightSettings {
     private final boolean highlight;
@@ -45,7 +45,7 @@ public class HighlightSettings {
         if(flashCycle >= flashRate) {
             flashCycle = 0;
             isActive = !isActive;
-            entity.setGlowing(isActive);
+            entity.setGlowingTag(isActive);
         }
         ++flashCycle;
     }

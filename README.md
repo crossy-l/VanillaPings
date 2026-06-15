@@ -8,6 +8,9 @@ It's possible to customize the language used for messages (see: [custom messages
 
 The mod uses the game rules `sendCommandFeedback` and `logAdminCommands` for command feedback and logging (just like vanilla commands) on all [admin commands](admin-commands-only-for-operators-work-from-the-console).
 
+> [!NOTE]
+> **Newer builds (starting `1.11.0` and higher)** were rebuilt to support a wider range of Minecraft versions. If you run into any problem on one of these versions, please [open an issue](../../issues) — and in the meantime you can safely fall back to **`1.10.3`**, the last release before this change.
+
 ## Usage
 The mod is required on the server. But not mandatory for clients. However, using it on the client adds a customizable hotkey for pinging. **Admin commands** behave like vanilla operator commands and **can only be run by operators**.
 

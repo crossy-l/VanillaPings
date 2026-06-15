@@ -7,36 +7,42 @@ import com.vanillapings.util.InputCooldown;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+//? if >=26.1 {
+/*import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+*///?} else {
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+//?}
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
 import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public class ClientPingInputs {
-    private static KeyBinding pingKey;
+    private static KeyMapping pingKey;
     private static final InputCooldown inputCooldown = new InputCooldown(5);
 
     public static void register() {
-        pingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                //? if >=1.21.9 {
-                Compat.id(Translations.KEY_PING).toTranslationKey(),
-                //?} else {
-                /*Translations.KEY_PING,*/
-                //?}
-                InputUtil.Type.KEYSYM,
+        //? if >=26.1 {
+        /*pingKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        *///?} else {
+        pingKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        //?}
+                // The bind label is a translation key; the lang file maps "vanillapings.ping"
+                // (dot form), so convert the "vanillapings:ping" id rather than passing it raw.
+                Compat.id(Translations.KEY_PING).toLanguageKey(),
+                InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_Z,
-                // Version-sensitive (client-only): KeyBinding.Category.create(...) on 1.21.9+,
+                // Version-sensitive (client-only): KeyMapping.Category.register(...) on 1.21.9+,
                 // a translation-key String on older versions.
                 //? if >=1.21.9 {
-                KeyBinding.Category.create(Compat.id(Translations.KEY_CATEGORY))
+                KeyMapping.Category.register(Compat.id(Translations.KEY_CATEGORY))
                 //?} else {
-                /*Translations.KEY_CATEGORY*/
-                //?}
+                /*Compat.id(Translations.KEY_CATEGORY).toLanguageKey("key.category")
+                *///?}
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (pingKey.isPressed() && inputCooldown.isReady()) {
+            if (pingKey.isDown() && inputCooldown.isReady()) {
                 inputCooldown.triggerCooldown();
                 ClientPingManager.pingInFrontOfPlayer();
             } else {

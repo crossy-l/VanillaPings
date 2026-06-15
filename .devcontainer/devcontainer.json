@@ -1,0 +1,33 @@
+{
+  "name": "VanillaPings (multi-version, Mojmap)",
+  "build": { "dockerfile": "Dockerfile" },
+
+  // Persist the Gradle cache (Minecraft jars, deps, decompiled sources) across rebuilds.
+  "mounts": [
+    "source=vanillapings-gradle-cache,target=/home/vscode/.gradle,type=volume"
+  ],
+  "remoteUser": "vscode",
+  // The mounted cache volume starts root-owned; hand it to the dev user.
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.gradle || true",
+
+  // runServer listens here; runClient needs a display and is best run on the host.
+  "forwardPorts": [25565],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-gradle"
+      ],
+      "settings": {
+        "java.jdt.ls.java.home": "/opt/jdk25",
+        "java.import.gradle.java.home": "/opt/jdk25",
+        "java.configuration.runtimes": [
+          { "name": "JavaSE-17", "path": "/opt/jdk17" },
+          { "name": "JavaSE-21", "path": "/opt/jdk21" },
+          { "name": "JavaSE-25", "path": "/opt/jdk25", "default": true }
+        ]
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@ import com.vanillapings.networking.PingNetworking;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 @Environment(EnvType.CLIENT)
 public class ClientPingManager {
@@ -14,9 +14,9 @@ public class ClientPingManager {
      */
     public static void pingInFrontOfPlayer() {
         //? if >=1.20.5 {
-        ClientPlayNetworking.send(new PingNetworking.PingPayload(BlockPos.ORIGIN));
+        ClientPlayNetworking.send(new PingNetworking.PingPayload(BlockPos.ZERO));
         //?} else {
-        /*ClientPlayNetworking.send(PingNetworking.ID_PING, net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create());*/
-        //?}
+        /*ClientPlayNetworking.send(PingNetworking.ID_PING, net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create());
+        *///?}
     }
 }

@@ -5,10 +5,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.vanillapings.VanillaPings;
 import com.vanillapings.translation.Translations;
 import com.vanillapings.translation.Translator;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 public class ReloadCommand {
-    public static int Reload(CommandContext<ServerCommandSource> ctx) {
+    public static int Reload(CommandContext<CommandSourceStack> ctx) {
         VanillaPings.SETTINGS.reload();
         Translator.clearTranslators();
         VanillaPingsCommands.sendCommandFeedBack(Translations.RELOAD.constructMessage(), ctx.getSource());
