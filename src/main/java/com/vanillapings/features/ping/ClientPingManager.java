@@ -16,7 +16,7 @@ public class ClientPingManager {
         //? if >=1.20.5 {
         ClientPlayNetworking.send(new PingNetworking.PingPayload(BlockPos.ZERO));
         //?} else {
-        /*ClientPlayNetworking.send(PingNetworking.ID_PING, net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create());*/
-        //?}
+        /*ClientPlayNetworking.send(PingNetworking.ID_PING, net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create());
+        *///?}
     }
 }

@@ -53,10 +53,12 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.withType<org.gradle.language.jvm.tasks.ProcessResources>().configureEach {
     val v = project.version.toString()
     val mc = mcCompat
+    val java = requiredJava.majorVersion
     inputs.property("version", v)
     inputs.property("minecraft", mc)
-    filesMatching("fabric.mod.json") {
-        expand("version" to v, "minecraft" to mc)
+    inputs.property("java", java)
+    filesMatching(listOf("fabric.mod.json", "*.mixins.json")) {
+        expand("version" to v, "minecraft" to mc, "java" to java)
     }
 }
 

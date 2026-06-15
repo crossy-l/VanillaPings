@@ -27,11 +27,9 @@ public class ClientPingInputs {
         *///?} else {
         pingKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
         //?}
-                //? if >=1.21.9 {
-                Translations.KEY_PING,
-                //?} else {
-                /*Translations.KEY_PING,*/
-                //?}
+                // The bind label is a translation key; the lang file maps "vanillapings.ping"
+                // (dot form), so convert the "vanillapings:ping" id rather than passing it raw.
+                Compat.id(Translations.KEY_PING).toLanguageKey(),
                 InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_Z,
                 // Version-sensitive (client-only): KeyMapping.Category.register(...) on 1.21.9+,
@@ -39,8 +37,8 @@ public class ClientPingInputs {
                 //? if >=1.21.9 {
                 KeyMapping.Category.register(Compat.id(Translations.KEY_CATEGORY))
                 //?} else {
-                /*Translations.KEY_CATEGORY*/
-                //?}
+                /*Compat.id(Translations.KEY_CATEGORY).toLanguageKey("key.category")
+                *///?}
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

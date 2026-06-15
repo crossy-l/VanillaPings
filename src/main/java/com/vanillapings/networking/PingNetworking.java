@@ -52,8 +52,8 @@ public final class PingNetworking {
                 context.server().execute(() -> PingManager.pingWithCooldown(context.player())));
         //?} else {
         /*ServerPlayNetworking.registerGlobalReceiver(PingPayload.ID, (payload, context) ->
-                context.player().getServer().execute(() -> PingManager.pingWithCooldown(context.player())));*/
-        //?}
+                context.player().getServer().execute(() -> PingManager.pingWithCooldown(context.player())));
+        *///?}
     }
     //?} else {
     /*public static final net.minecraft.resources.ResourceLocation ID_PING = Compat.id(VanillaPings.MOD_ID, "ping");

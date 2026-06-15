@@ -22,6 +22,6 @@
     "fabricloader": ">=0.15.0",
     "fabric-api": "*",
     "minecraft": "${minecraft}",
-    "java": ">=21"
+    "java": ">=${java}"
   }
 }

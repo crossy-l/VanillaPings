@@ -28,8 +28,8 @@ import net.minecraft.network.chat.Component;
 //? if >=1.21.11 {
 import net.minecraft.resources.Identifier;
 //?} else {
-/*import net.minecraft.resources.ResourceLocation;*/
-//?}
+/*import net.minecraft.resources.ResourceLocation;
+*///?}
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
@@ -37,8 +37,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.level.gamerules.GameRules;
 //?} else {
-/*import net.minecraft.world.level.GameRules;*/
-//?}
+/*import net.minecraft.world.level.GameRules;
+*///?}
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -58,29 +58,29 @@ public final class Compat {
     //? if >=1.21.11 {
     public static Identifier id(String namespace, String path) {
     //?} else {
-    /*public static ResourceLocation id(String namespace, String path) {*/
-    //?}
+    /*public static ResourceLocation id(String namespace, String path) {
+    *///?}
         //? if >=1.21.11 {
         return Identifier.fromNamespaceAndPath(namespace, path);
         //?} elif >=1.21 {
         /*return ResourceLocation.fromNamespaceAndPath(namespace, path);*/
         //?} else {
-        /*return new ResourceLocation(namespace, path);*/
-        //?}
+        /*return new ResourceLocation(namespace, path);
+        *///?}
     }
 
     //? if >=1.21.11 {
     public static Identifier id(String id) {
     //?} else {
-    /*public static ResourceLocation id(String id) {*/
-    //?}
+    /*public static ResourceLocation id(String id) {
+    *///?}
         //? if >=1.21.11 {
         return Identifier.parse(id);
         //?} elif >=1.21 {
         /*return ResourceLocation.parse(id);*/
         //?} else {
-        /*return new ResourceLocation(id);*/
-        //?}
+        /*return new ResourceLocation(id);
+        *///?}
     }
 
     /** The entity's position. */
@@ -93,8 +93,8 @@ public final class Compat {
         //? if >=1.20 {
         return entity.level();
         //?} else {
-        /*return entity.level;*/
-        //?}
+        /*return entity.level;
+        *///?}
     }
 
     /** Resolve a sound. 1.19.4+ exposes {@code SoundEvents} as registry entries (needs {@code .value()}); 1.19.2 exposes raw {@code SoundEvent}. */
@@ -105,8 +105,8 @@ public final class Compat {
     //?} else {
     /*public static SoundEvent sound(SoundEvent event) {
         return event;
-    }*/
-    //?}
+    }
+    *///?}
 
     // ---- Item registry ----
     // 1.19.4+ uses net.minecraft.registry.BuiltInRegistries; 1.19.2 uses net.minecraft.util.registry.Registry.
@@ -115,39 +115,39 @@ public final class Compat {
     //? if >=1.21.11 {
     public static Identifier itemId(Item item) {
     //?} else {
-    /*public static ResourceLocation itemId(Item item) {*/
-    //?}
+    /*public static ResourceLocation itemId(Item item) {
+    *///?}
         //? if >=1.19.4 {
         return BuiltInRegistries.ITEM.getKey(item);
         //?} else {
-        /*return Registry.ITEM.getKey(item);*/
-        //?}
+        /*return Registry.ITEM.getKey(item);
+        *///?}
     }
 
     //? if >=1.21.11 {
     public static boolean itemExists(Identifier id) {
     //?} else {
-    /*public static boolean itemExists(ResourceLocation id) {*/
-    //?}
+    /*public static boolean itemExists(ResourceLocation id) {
+    *///?}
         //? if >=1.19.4 {
         return BuiltInRegistries.ITEM.containsKey(id);
         //?} else {
-        /*return Registry.ITEM.containsKey(id);*/
-        //?}
+        /*return Registry.ITEM.containsKey(id);
+        *///?}
     }
 
     //? if >=1.21.11 {
     public static Item getItem(Identifier id) {
     //?} else {
-    /*public static Item getItem(ResourceLocation id) {*/
-    //?}
+    /*public static Item getItem(ResourceLocation id) {
+    *///?}
         //? if >=1.21.3 {
         return BuiltInRegistries.ITEM.getValue(id);
         //?} elif >=1.19.4 {
         /*return BuiltInRegistries.ITEM.get(id);*/
         //?} else {
-        /*return Registry.ITEM.get(id);*/
-        //?}
+        /*return Registry.ITEM.get(id);
+        *///?}
     }
 
     /** True if two stacks carry equal enchantments. Storage became the {@code getEnchantments()} component at 1.20.5; older versions expose the raw NBT list. */
@@ -155,8 +155,8 @@ public final class Compat {
         //? if >=1.20.5 {
         return a.getEnchantments().equals(b.getEnchantments());
         //?} else {
-        /*return a.getEnchantmentTags().equals(b.getEnchantmentTags());*/
-        //?}
+        /*return a.getEnchantmentTags().equals(b.getEnchantmentTags());
+        *///?}
     }
 
     /** Send a message to the player's action-bar overlay. {@code displayClientMessage(text, true)} split into {@code sendOverlayMessage} at 26.1. */
@@ -187,8 +187,8 @@ public final class Compat {
         //? if >=1.21.3 {
         entity.kill(world);
         //?} else {
-        /*entity.kill();*/
-        //?}
+        /*entity.kill();
+        *///?}
     }
 
     /**
@@ -206,8 +206,8 @@ public final class Compat {
                 //? if >=1.21.3 {
                 EntitySpawnReason.COMMAND,
                 //?} else {
-                /*MobSpawnType.COMMAND,*/
-                //?}
+                /*MobSpawnType.COMMAND,
+                *///?}
                 false,  // alignPosition
                 false   // invertY
         );
@@ -216,8 +216,8 @@ public final class Compat {
         if (armorStand == null) return null;
         configurePingArmorStand(armorStand, customName, headItem, pos);
         ((ServerLevel) world).addFreshEntity(armorStand);
-        return armorStand;*/
-        //?}
+        return armorStand;
+        *///?}
     }
 
     private static void configurePingArmorStand(ArmorStand armorStand, Component customName, ItemStack headItem, Vec3 pos) {
@@ -244,8 +244,8 @@ public final class Compat {
         //? if >=1.21.11 {
         return source.permissions().hasPermission(Permissions.COMMANDS_ADMIN);
         //?} else {
-        /*return source.hasPermission(4);*/
-        //?}
+        /*return source.hasPermission(4);
+        *///?}
     }
 
     /** True if the player has admin-level (operator) permission. */
@@ -255,31 +255,31 @@ public final class Compat {
         //?} elif >=1.21.9 {
         /*return player.hasPermissions(server.operatorUserPermissionLevel());*/
         //?} else {
-        /*return player.hasPermissions(server.getOperatorUserPermissionLevel());*/
-        //?}
+        /*return player.hasPermissions(server.getOperatorUserPermissionLevel());
+        *///?}
     }
 
     public static boolean commandBlockOutput(CommandSourceStack source) {
         //? if >=1.21.11 {
         return source.getLevel().getGameRules().get(GameRules.COMMAND_BLOCK_OUTPUT);
         //?} else {
-        /*return source.getLevel().getGameRules().getBoolean(GameRules.RULE_COMMANDBLOCKOUTPUT);*/
-        //?}
+        /*return source.getLevel().getGameRules().getBoolean(GameRules.RULE_COMMANDBLOCKOUTPUT);
+        *///?}
     }
 
     public static boolean sendCommandFeedback(CommandSourceStack source) {
         //? if >=1.21.11 {
         return source.getLevel().getGameRules().get(GameRules.SEND_COMMAND_FEEDBACK);
         //?} else {
-        /*return source.getLevel().getGameRules().getBoolean(GameRules.RULE_SENDCOMMANDFEEDBACK);*/
-        //?}
+        /*return source.getLevel().getGameRules().getBoolean(GameRules.RULE_SENDCOMMANDFEEDBACK);
+        *///?}
     }
 
     public static boolean logAdminCommands(CommandSourceStack source) {
         //? if >=1.21.11 {
         return source.getLevel().getGameRules().get(GameRules.LOG_ADMIN_COMMANDS);
         //?} else {
-        /*return source.getLevel().getGameRules().getBoolean(GameRules.RULE_LOGADMINCOMMANDS);*/
-        //?}
+        /*return source.getLevel().getGameRules().getBoolean(GameRules.RULE_LOGADMINCOMMANDS);
+        *///?}
     }
 }
