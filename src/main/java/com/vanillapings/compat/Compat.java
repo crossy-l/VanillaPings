@@ -248,7 +248,12 @@ public final class Compat {
         accessor.invokeSetSmall(true);
         armorStand.setInvisible(true);
         armorStand.setNoGravity(true);
+        // setInvulnerable was renamed setPermanentlyInvulnerable at 26.3.
+        //? if >=26.3 {
+        /*armorStand.setPermanentlyInvulnerable(true);
+        *///?} else {
         armorStand.setInvulnerable(true);
+        //?}
         accessor.invokeSetHideBasePlate(true);
         accessor.invokeSetShowArms(false);
         armorStand.setCustomName(customName);
